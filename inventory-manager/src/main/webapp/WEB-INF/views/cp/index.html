@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <title>Dashboard | Simple - Responsive Bootstrap 4 Admin Dashboard</title>
+    <th:block th:replace="/layout/head :: head" />
+</head>
+
+<body>
+
+<!-- Begin page -->
+<div id="wrapper">
+
+    <!-- Topbar Start -->
+    <div class="navbar-custom">
+        <th:block th:replace="/layout/navbar-top :: navbar-top" />
+    </div>
+    <!-- end Topbar --> <!-- ========== Left Sidebar Start ========== -->
+    <div class="left-side-menu">
+
+        <th:block th:replace="/layout/left-side-menu :: left-side-menu" />
+
+        <div class="clearfix"></div>
+
+    </div>
+    <!-- Left Sidebar End -->
+
+    <!-- ============================================================== -->
+    <!-- Start Page Content here -->
+    <!-- ============================================================== -->
+
+    <div class="content-page">
+        <div class="content">
+
+            <!-- Start container-fluid -->
+            <div class="container-fluid">
+
+                <div class="row">
+                    <div class="col-12">
+                        <div>
+                            <h4 class="header-title mb-3">Welcome !</h4>
+                        </div>
+                    </div>
+                </div>
+                <!-- end row -->
+
+            </div>
+            <!-- end container-fluid -->
+
+
+            <!-- Footer Start -->
+            <th:block th:replace="/layout/footer :: footer" />
+            <!-- end Footer -->
+
+        </div>
+        <!-- end content -->
+
+    </div>
+    <!-- END content-page -->
+
+</div>
+<!-- END wrapper -->
+
+
+<!-- Right Sidebar -->
+<th:block th:replace="/layout/right-bar :: right-bar" />
+<!-- /Right-bar -->
+
+<!-- Right bar overlay-->
+<div class="rightbar-overlay"></div>
+
+<a href="javascript:void(0);" class="right-bar-toggle demos-show-btn">
+    <i class="mdi mdi-settings-outline mdi-spin"></i> &nbsp;Choose Demos
+</a>
+
+    <th:block th:replace="/layout/script :: script" />
+
+</body>
+
+</html>
