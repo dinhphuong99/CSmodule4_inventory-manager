@@ -1,0 +1,17 @@
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<th:block th:fragment="left-side-menu">
+    <div class="user-box">
+        <div class="float-left">
+            <img src="/assets/images/users/avatar-1.jpg" alt="" class="avatar-md rounded-circle">
+        </div>
+        <div class="user-info">
+            <a href="#">Stanley Jones</a>
+            <p class="text-muted m-0">Administrator</p>
+        </div>
+    </div>
+
+    <!--- Sidemenu -->
+    <th:block th:replace="/layout/sidebar-menu :: sidebar-menu" />
+    <!-- End Sidebar -->
+</th:block>
