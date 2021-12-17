@@ -16,5 +16,4 @@ public class UserController {
         modelAndView.setViewName("/user/list");
         return modelAndView;
     }
-
 }

@@ -11,7 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class CategoryController {
 
     @GetMapping
-    public ModelAndView listCustomers() {
+    public ModelAndView listCategories() {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("/category/list");
         return modelAndView;

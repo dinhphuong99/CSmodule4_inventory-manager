@@ -1,7 +1,6 @@
 package com.cg.controller.api;
 
 import com.cg.exception.DataInputException;
-import com.cg.exception.TitleExistsException;
 import com.cg.model.*;
 import com.cg.model.dto.*;
 import com.cg.service.item.ItemService;
