@@ -100,7 +100,7 @@ public class CategoryAPI {
         return categoryUpdated;
     }
 
-    @GetMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Boolean> delete(@PathVariable Long id) {
 
         try {

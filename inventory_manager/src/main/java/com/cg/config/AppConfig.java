@@ -1,7 +1,5 @@
 package com.cg.config;
 
-import com.cg.service.customer.CustomerServiceImpl;
-import com.cg.service.customer.ICustomerService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -51,10 +49,10 @@ public class AppConfig implements WebMvcConfigurer, ApplicationContextAware {
         this.applicationContext = applicationContext;
     }
 
-    @Bean
-    public ICustomerService customerService() {
-        return new CustomerServiceImpl();
-    }
+//    @Bean
+//    public ICustomerService customerService() {
+//        return new CustomerServiceImpl();
+//    }
 
 
     // Thymeleaf Configuration
@@ -155,7 +153,7 @@ public class AppConfig implements WebMvcConfigurer, ApplicationContextAware {
         registry.addMapping("/api/**")
 //                .allowedOrigins("https://mysterious-mountain-94405.herokuapp.com")
                 .allowedOrigins("*")
-                .allowedMethods("GET", "POST", "DELETE")
+                .allowedMethods("GET", "POST", "DELETE", "PUT")
                 .allowedHeaders("*")
                 .allowCredentials(false)
                 .maxAge(3600);

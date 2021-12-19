@@ -24,7 +24,7 @@ public class Category {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
 
-    @Size(min = 1, max = 45, message = "Title within 255 characters ! ")
+    @Size(min = 1, max = 45, message = "Title within 45 characters ! ")
     @Column(unique = true)
     private String titleCategory;
 
