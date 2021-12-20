@@ -64,12 +64,14 @@
         function getCategories() {
             return $.ajax({
                 type: "GET",
-                // url: page.urls.getAllCategories,
-                url: "http://localhost:8080/api/categories",
+                url: page.urls.getAllCategories,
+                // url: "http://localhost:8080/api/categories",
             }).done((data) => {
+                data = data.sort(function (cat1, cat2) {
+                    return cat1.id - cat2.id;
+                });
                 $.each(data, (index, item) => {
                     category = item;
-                    console.log(category);
                     addRow();
                 });
             }).fail(function() {
