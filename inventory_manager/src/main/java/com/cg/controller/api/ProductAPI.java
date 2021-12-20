@@ -99,24 +99,6 @@ public class ProductAPI {
         }
     }
 
-    @PostMapping("/create")
-    public Product create(@RequestBody ProductDTO productDTO) {
-        Product product = productDTO.toProduct();
-        CategoryDTO categoryDTO = productDTO.getCategoryDTO();
-        Category categorySaved = categoryService.save(categoryDTO.toCategory());
-        product.setCategory(categorySaved);
-        Product productCreated = productService.save(product);
-        return productCreated;
-    }
-
-    @PostMapping("/update")
-    public Product update(@RequestBody Product product) {
-
-        Product productUpdated = productService.save(product);
-
-        return productUpdated;
-    }
-
     @GetMapping("/delete/{id}")
     public ResponseEntity<Boolean> delete(@PathVariable Long id) {
 
