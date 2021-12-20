@@ -4,6 +4,7 @@ class App {
     static BASE_URL_CUSTOMER = this.DOMAIN + "/api/customers";
     static BASE_URL_TRANSFER = this.DOMAIN + "/api/transfers";
     static BASE_URL_CATEGORY = this.DOMAIN + "/api/categories";
+    static BASE_URL_PRODUCT = this.DOMAIN + "/api/products";
 
     static showSuspendedConfirmDialog() {
         return Swal.fire({

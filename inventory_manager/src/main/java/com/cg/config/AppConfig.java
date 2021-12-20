@@ -49,12 +49,6 @@ public class AppConfig implements WebMvcConfigurer, ApplicationContextAware {
         this.applicationContext = applicationContext;
     }
 
-//    @Bean
-//    public ICustomerService customerService() {
-//        return new CustomerServiceImpl();
-//    }
-
-
     // Thymeleaf Configuration
     @Bean
     public SpringResourceTemplateResolver templateResolver() {
@@ -140,14 +134,6 @@ public class AppConfig implements WebMvcConfigurer, ApplicationContextAware {
         return messageSource;
     }
 
-//    @Bean
-//    public MultipartResolver multipartResolver() {
-//        CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver();
-//        commonsMultipartResolver.setMaxUploadSize(100000);
-//        commonsMultipartResolver.setDefaultEncoding("UTF-8");
-//        return commonsMultipartResolver;
-//    }
-
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
@@ -159,12 +145,4 @@ public class AppConfig implements WebMvcConfigurer, ApplicationContextAware {
                 .maxAge(3600);
     }
 
-//    @Bean
-//    public JpaVendorAdapter jpaVendorAdapter(){
-//        HibernateJpaVendorAdapter jpaVendorAdapter = new HibernateJpaVendorAdapter();
-//        jpaVendorAdapter.setGenerateDdl(true);
-//        jpaVendorAdapter.setShowSql(true);
-//
-//        return jpaVendorAdapter;
-//    }
 }
