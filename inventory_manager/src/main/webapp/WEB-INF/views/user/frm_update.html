@@ -1,27 +1,46 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 
-<th:block th:fragment="frm-update">
+<th:block th:fragment="frm-create">
 
-    <div id="modalUpdateProduct" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div id="modalUpdateOrder" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Product information</h5>
+                    <!--                    .setContent(content)-->
+                    <!--                    .setCreateAt(createAt)-->
+                    <!--                    .setUser(user.toUserDTO())-->
+                    <!--                    .setStatus(status)-->
+                    <!--                    .setTotalFee(totalFee);-->
+                    <h5 class="modal-title">Order information</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="modal-alert-danger hide"></div>
-                    <form id="frmUpdateProduct" method="post">
+
+                    <form id="frmUpdateUserUp" method="post">
                         <fieldset class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Title product</label>
-                                <input type="text" class="form-control" id="upTitle" name="upTitle">
+                            <div class="col-md-4">
+                                <label class="form-label">User</label>
+                                <select id="userUp" class="select form-control">
+                                </select>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Status</label>
+                                <select id="statusUp" class="select form-control">
+                                </select>
                             </div>
 
                             <div class="col-md-4">
-                                <label class="form-label">Category</label>
-                                <select id="upCategory" class="select form-control">
-                                </select>
+                                <label class="form-label">Content</label>
+                                <input type="text" class="form-control" id="contentUp" name="contentUp" data-rule-required="true"
+                                       data-msg-required="Content is required">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Total Fee</label>
+                                <input type="number" class="form-control" id="totalFeeUp" name="totalFeeUp" data-rule-required="true"
+                                       data-msg-required="TotalFee is required">
                             </div>
                         </fieldset>
                     </form>
@@ -29,9 +48,9 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 
-                    <button type="button" id="btnUpdateProduct" class="btn btn-outline-secondary">
-                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-                        Update category
+                    <button type="button" id="btnUpdateOrder" class="btn btn-outline-primary">
+                        <i class="fa fa-plus" aria-hidden="true"></i>
+                        Update order
                     </button>
                 </div>
             </div>
@@ -39,3 +58,6 @@
     </div>
 
 </th:block>
+
+
+

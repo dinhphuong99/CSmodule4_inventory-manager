@@ -1,318 +1,547 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <title>User management</title>
+    <title>Customer management</title>
     <th:block th:replace="/layout/head :: head" />
 </head>
 <body>
-<div class="container">
-    <div class="table-title">
-        <div class="row">
-            <div class="col-sm-5">
-                <h1>List of user</h1>
-            </div>
-            <div class="col-sm-7">
-                <a class="btn btn-outline-light create-modal"><i class="fa fa-plus-square-o" aria-hidden="true"></i> <span>Add New User</span></a>
+    <div class="container">
+        <div class="table-title">
+            <div class="row">
+                <div class="col-sm-5">
+                    <h1>List of customers</h1>
+                </div>
+                <div class="col-sm-7">
+                    <a class="btn btn-outline-light create-modal"><i class="fa fa-plus-square-o" aria-hidden="true"></i> <span>Add New Customer</span></a>
+                    <a href="/transfers" class="btn btn-outline-light"><i class="fa fa-history" aria-hidden="true"></i> <span>Transfer money Information</span></a>
+                </div>
             </div>
         </div>
+        <div class="box-body">
+
+            <th:block th:replace="/customer/frm_list_table :: list-customers" />
+
+            <input type="hidden" id="currentRow"/>
+
+            <table id="tbListCustomers" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>FullName</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                        <th>Balance</th>
+                        <th colspan="5">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+
+        </div>
     </div>
-    <div class="box-body">
 
-        <th:block th:replace="/user/frm_list_table.html::list-users" />
+    <th:block th:replace="/customer/frm_create :: frm-create" />
 
-        <input type="hidden" id="currentRow"/>
+    <th:block th:replace="/customer/frm_update :: frm-update" />
 
-        <table id="tbListUsers" class="table table-hover">
-            <thead>
-            <tr>
-                <th>#</th>
-                <th>Role</th>
-                <th>Full Name</th>
-                <th>Phone</th>
-                <th>Username</th>
-                <th>Password</th>
-                <th colspan="2">Action</th>
-            </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
+    <th:block th:replace="/customer/frm_deposit :: frm-deposit" />
 
-    </div>
-</div>
+    <th:block th:replace="/customer/frm_withdraw :: frm-withdraw" />
 
-<th:block th:replace="/user/frm_create :: frm-create" />
+    <th:block th:replace="/customer/frm_transfer :: frm-transfer" />
 
-<th:block th:replace="/user/frm_update :: frm-update" />
+    <th:block th:replace="/layout/script :: script" />
 
-<th:block th:replace="/layout/script :: script" />
-
-<script>
-    let page = {
-        urls: {
-            getAllCategories: App.BASE_URL_CATEGORY,
-            getAllUsers: App.BASE_URL_USER,
-            getUserById: App.BASE_URL_USER + '/',
-            saveNew: App.BASE_URL_USER + '/create/',
-            saveEdit: App.BASE_URL_USER + '/update/',
-            doDelete: App.BASE_URL_USER + '/delete/'
+    <script>
+        let page = {
+            urls: {
+                getAllCustomers: App.BASE_URL_CUSTOMER,
+                getCustomerById: App.BASE_URL_CUSTOMER + '/edit/',
+                getDeposit: App.BASE_URL_CUSTOMER + '/deposit/',
+                getWithdraw: App.BASE_URL_CUSTOMER + '/withdraw/',
+                getTransfer: App.BASE_URL_CUSTOMER + '/transfer/',
+                saveNew: App.BASE_URL_CUSTOMER,
+                saveEdit: App.BASE_URL_CUSTOMER + '/edit/',
+                doDeposit: App.BASE_URL_CUSTOMER + '/deposit/',
+                doWithdraw: App.BASE_URL_CUSTOMER + '/withdraw/',
+                doTransfer: App.BASE_URL_CUSTOMER + '/transfer/',
+                doSuspend: App.BASE_URL_CUSTOMER + '/suspend/'
+            }
         }
-    }
 
-    let user = new User();
+        let customer = new Customer();
+        let deposit = new Deposit();
+        let withdraw = new Withdraw();
+        let transfer = new Transfer();
+        let sender = new Sender();
+        let recipient = new Recipient();
+        let tempCustomer = jQuery.validator.format($.trim($("#tempCustomer").val()));
 
-    let tempUser = jQuery.validator.format($.trim($("#tempUser").val()));
-
-    let addRow = () => {
-
-        $("#tbListUsers tbody").prepend($(tempUser(user.id, role[user.roleId - 1], user.fullName, user.phone, user.username, user.passwordHash)));
-    }
-
-    function getUsers() {
-
-        return $.ajax({
-            type: "GET",
-            // url: page.urls.getAllUsers,
-            url: "http://localhost:8080/api/users"
-        }).done((data) => {
-            data = data.sort(function (prod1, prod2) {
-                return prod1.id - prod2.id;
-            });
-            $.each(data, (index, item) => {
-                user = item;
-                addRow();
-            });
-        }).fail(function() {
-            App.showErrorAlert("An error occurred. Please try again later !");
-        });
-    }
-
-    function drawOptionRoles(){
-        let str =``;
-        for (let i = 1; i <= role.length; i++) {
-            str += `<option value="${i}">${role[i-1]}</option>`;
+        let addRow = () => {
+            $("#tbListCustomers tbody").prepend($(tempCustomer(customer.id, customer.fullName, customer.email, customer.phone, customer.address, customer.balance)));
         }
-        $("#role").html(str);
-    }
 
-    function drawOptionRolesUp(){
-        let str =``;
-        for (let i = 1; i <= role.length; i++) {
-            str += `<option value="${i}">${role[i-1]}</option>`;
-        }
-        $("#roleUp").html(str);
-    }
-
-    function showCreateModal() {
-        $('#modalCreateUser').modal('show');
-    }
-
-    function showUpdateModal() {
-
-        if (user.id == null) {
-            $('#modalUpdateUser').modal('hide');
-            $('#frmUpdateUser')[0].reset();
-        } else {
-            $.ajax({
+        function getCustomers() {
+            return $.ajax({
                 type: "GET",
-                url: page.urls.getUserById + user.id,
-            }).done((resp) => {
-                user = resp;
-                assignUpdateModal();
-
+                url: page.urls.getAllCustomers,
+            }).done((data) => {
+                $.each(data, (index, item) => {
+                    customer = item;
+                    customer.balance = App.formatNumberSpace(customer.balance);
+                    addRow();
+                });
             }).fail(function() {
                 App.showErrorAlert("An error occurred. Please try again later !");
             });
         }
-    }
 
-    function assignUpdateModal() {
-        $("#fullNameUp").val(user.fullName);
+        function showCreateModal() {
+            $('#modalCreateCustomer').modal('show');
+        }
 
-        $("#roleUp :selected").val(user.roleId);
-        $("#phoneUp").val(user.phone);
-        $("#userNameUp").val(user.username);
-        $("#passwordUp").val(user.passwordHash);
-        $('#modalUpdateUser').modal('show');
-    }
+        function showUpdateModal() {
+            if (customer.id == null) {
+                $('#modalUpdateCustomer').modal('hide');
+                $('#frmUpdateCustomer')[0].reset();
+            } else {
+                $.ajax({
+                    type: "GET",
+                    url: page.urls.getCustomerById + customer.id,
+                }).done((resp) => {
+                    customer = resp;
 
-    $("#btnUpdateUser").on("click", function () {
-        user.fullName = $("#fullNameUp").val();
-        user.roleId = $("#roleUp").val();
-        user.roleId = $("#roleUp :selected").val();
-        user.phone = $("#phoneUp").val();
-        user.username = $("#userNameUp").val();
-        user.passwordHash = $("#passwordUp").val();
+                    // assignUpdateModal();
 
-        $.ajax({
-            type: "PUT",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            url: page.urls.saveEdit,
-            data: JSON.stringify(user)
-        }).done( (resp) => {
-            user = resp;
+                    $("#fullNameUp").val(customer.fullName);
+                    $("#emailUp").val(customer.email);
+                    $("#phoneUp").val(customer.phone);
+                    $('#addressUp').val(customer.address);
 
-            let current_row = $("#tbListUsers tbody").find('#' + $("#currentRow").val());
-            let updated_row = $(tempUser(user.id, role[user.roleId - 1], user.fullName, user.phone, user.username, user.passwordHash))
-            current_row.replaceWith (updated_row);
+                    $('#modalUpdateCustomer').modal('show');
+                }).fail(function() {
+                    App.showErrorAlert("An error occurred. Please try again later !");
+                });
+            }
+        }
 
+        function assignUpdateModal() {
+            $("#upFullName").val(customer.fullName);
+            $("#upEmail").val(customer.email);
+            $("#upPhone").val(customer.phone);
+            $('#upAddress').val(customer.address);
+            $('#modalUpdateCustomer').modal('show');
+        }
+
+        function showDepositModal() {
+            if (deposit.customerId == null) {
+                $('#modalDeposit').modal('hide');
+                $('#frmDeposit')[0].reset();
+            } else {
+                $.ajax({
+                    type: "GET",
+                    url: page.urls.getDeposit + deposit.customerId,
+                }).done((resp) => {
+                    deposit = resp;
+
+                    $("#customerIdDep").val(deposit.customerId);
+                    $("#fullNameDep").val(deposit.fullName);
+                    $("#balanceDep").val(deposit.balance);
+
+                    $('#modalDeposit').modal('show');
+                }).fail(function() {
+                    App.showErrorAlert("An error occurred. Please try again later !");
+                });
+            }
+        }
+
+        function showWithdrawModal() {
+            if (withdraw.customerId == null) {
+                $('#modalWithdraw').modal('hide');
+                $('#frmWithdraw')[0].reset();
+            } else {
+                $.ajax({
+                    type: "GET",
+                    url: page.urls.getWithdraw + withdraw.customerId,
+                }).done((resp) => {
+                    withdraw = resp;
+
+                    // withdraw.balance = App.formatNumberSpace(withdraw.balance);
+                    $("#customerIdWd").val(withdraw.customerId);
+                    $("#fullNameWd").val(withdraw.fullName);
+                    $("#balanceWd").val(withdraw.balance);
+
+                    $('#modalWithdraw').modal('show');
+                }).fail(function() {
+                    App.showErrorAlert("An error occurred. Please try again later !");
+                });
+            }
+        }
+
+        function showTransferModal() {
+            if (transfer.senderId == null) {
+                $('#modalTransfer').modal('hide');
+                $('#frmTransfer')[0].reset();
+            } else {
+                $.ajax({
+                    type: "GET",
+                    url: page.urls.getTransfer + transfer.senderId,
+                }).done((resp) => {
+                    transfer = resp.sender;
+
+                    let recipients = [];
+                    recipients = resp.recipients;
+
+                    let str = ``;
+
+                    $.each(recipients, (index, item) => {
+                        str += `<option value="${item.recipientId}">(${item.recipientId}) ${item.recipientName}</option>`;
+                    });
+
+                    $("#recipientIdTrf").html(str);
+
+                    $("#senderIdTrf").val(transfer.senderId);
+                    $("#senderNameTrf").val(transfer.senderName);
+                    $("#emailTrf").val(transfer.email);
+                    $("#balanceTrf").val(transfer.balance);
+
+                    $('#modalTransfer').modal('show');
+                }).fail(function() {
+                    App.showErrorAlert("An error occurred. Please try again later !");
+                });
+            }
+        }
+
+        function showSuspendedModal() {
+            App.showSuspendedConfirmDialog()
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            type: "POST",
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            },
+                            url: page.urls.doSuspend + customer.id
+                        }).done( () => {
+                            App.showSuccessAlert("Succeeded client suspension!");
+                            $("#tr_" + customer.id).remove();
+                        }).fail( () => {
+                            App.showErrorAlert("An error occurred. Please try again later!");
+                        });
+                    }
+                });
+        }
+
+        $("#btnCreateCustomer").on("click", function () {
+            customer.fullName = $("#fullName").val();
+            customer.email = $("#email").val();
+            customer.phone = $("#phone").val();
+            customer.address = $("#address").val();
+
+            $.ajax({
+                type: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                url: page.urls.saveNew,
+                data: JSON.stringify(customer)
+            }).done( (data) => {
+                customer = data;
+                addRow();
+
+                App.showSuccessAlert("Successful data generation !");
+                App.formatTooltip();
+
+                $('#modalCreateCustomer').modal('hide');
+
+            }).fail( (jqXHR, textStatus, errorThrown) => {
+                $("#modalCreateCustomer .modal-body .modal-alert-danger").empty();
+                $("#modalCreateCustomer .modal-body .modal-alert-danger").removeClass("hide").addClass("show");
+
+                let str = ``;
+                $.each( jqXHR.responseJSON, function( key, value ) {
+                    str += `<label id="${key}-error" class="error" for="${key}">${value}</label>`;
+                    $("#" + key).addClass("error");
+                });
+                $("#modalCreateCustomer .modal-body .modal-alert-danger").html(str);
+            });
+        });
+
+        $("#btnUpdateCustomer").on("click", function () {
+            customer.fullName = $("#fullNameUp").val();
+            customer.email = $("#emailUp").val();
+            customer.phone = $("#phoneUp").val();
+            customer.address = $("#addressUp").val();
+
+            $.ajax({
+                type: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                url: page.urls.saveEdit,
+                data: JSON.stringify(customer)
+            }).done( (resp) => {
+                customer = resp;
+                customer.balance = App.formatNumberSpace(customer.balance);
+                let current_row = $("#tbListCustomers tbody").find('#' + $("#currentRow").val());
+                let updated_row = $(tempCustomer(customer.id, customer.fullName, customer.email, customer.phone, customer.address, customer.balance))
+                current_row.replaceWith (updated_row);
+
+                $("#currentRow").val("");
+                $("#frmUpdateCustomer")[0].reset();
+                $("#frmUpdateCustomer").validate().resetForm();
+
+                App.showSuccessAlert("Data update successful !");
+                App.formatTooltip();
+
+                $('#modalUpdateCustomer').modal('hide');
+
+            }).fail( (jqXHR) => {
+                $("#modalUpdateCustomer .modal-body .modal-alert-danger").empty();
+                $("#modalUpdateCustomer .modal-body .modal-alert-danger").removeClass("hide").addClass("show");
+
+                let str = ``;
+                $.each( jqXHR.responseJSON, function( key, value ) {
+                    str += `<label id="${key}Up-error" class="error" for="${key}Up">${value}</label>`;
+                    $("#" + key + "Up").addClass("error");
+                });
+                $("#modalUpdateCustomer .modal-body .modal-alert-danger").html(str);
+            });
+        });
+
+        $("#btnDepositMoney").on("click", function () {
+            deposit.customerId = $("#customerIdDep").val();
+            deposit.transactionAmount = $("#transactionAmountDep").val();
+            deposit.balance = App.removeFormatNumberSpace(deposit.balance);
+
+            $.ajax({
+                type: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                url: page.urls.doDeposit,
+                data: JSON.stringify(deposit)
+            }).done( (resp) => {
+                customer = resp;
+
+                customer.balance = App.formatNumberSpace(customer.balance);
+                let current_row = $("#tbListCustomers tbody").find('#' + $("#currentRow").val());
+                let updated_row = $(tempCustomer(customer.id, customer.fullName, customer.email, customer.phone, customer.address, customer.balance))
+                current_row.replaceWith (updated_row);
+
+                App.showSuccessAlert("Successful deposit transaction !");
+                App.formatTooltip();
+
+                $('#modalDeposit').modal('hide');
+
+            }).fail( (jqXHR) => {
+                $("#modalDeposit .modal-body .modal-alert-danger").empty();
+                $("#modalDeposit .modal-body .modal-alert-danger").removeClass("hide").addClass("show");
+
+                let str = ``;
+                $.each( jqXHR.responseJSON, function( key, value ) {
+                    str += `<label id="${key}Dep-error" class="error" for="${key}Dep">${value}</label>`;
+                    $("#" + key + "Dep").addClass("error");
+                });
+                $("#modalDeposit .modal-body .modal-alert-danger").html(str);
+            });
+        });
+
+        $("#btnWithdrawMoney").on("click", function () {
+            withdraw.customerId = $("#customerIdWd").val();
+            withdraw.transactionAmount = $("#transactionAmountWd").val();
+            withdraw.balance = App.removeFormatNumberSpace(withdraw.balance);
+
+            $.ajax({
+                type: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                url: page.urls.doWithdraw,
+                data: JSON.stringify(withdraw)
+            }).done( (resp) => {
+                customer = resp;
+
+                customer.balance = App.formatNumberSpace(customer.balance);
+                let current_row = $("#tbListCustomers tbody").find('#' + $("#currentRow").val());
+                let updated_row = $(tempCustomer(customer.id, customer.fullName, customer.email, customer.phone, customer.address, customer.balance))
+                current_row.replaceWith (updated_row);
+
+                App.showSuccessAlert("Successful withdraw transaction !");
+                App.formatTooltip();
+
+                $('#modalWithdraw').modal('hide');
+
+            }).fail( (jqXHR) => {
+                $("#modalWithdraw .modal-body .modal-alert-danger").empty();
+                $("#modalWithdraw .modal-body .modal-alert-danger").removeClass("hide").addClass("show");
+
+                let str = ``;
+                $.each( jqXHR.responseJSON, function( key, value ) {
+                    str += `<label id="${key}Wd-error" class="error" for="${key}Wd">${value}</label>`;
+                    $("#" + key + "Wd").addClass("error");
+                });
+                $("#modalWithdraw .modal-body .modal-alert-danger").html(str);
+            });
+        });
+
+        $("#btnTransferMoney").on("click", function () {
+            transfer.transferAmount = App.removeFormatNumberSpace($("#transferAmountTrf").val());
+            transfer.recipientId = $("#recipientIdTrf").val();
+
+            $.ajax({
+                type: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                url: page.urls.doTransfer,
+                data: JSON.stringify(transfer)
+            }).done( (resp) => {
+                sender = resp.sender;
+                recipient = resp.recipient;
+
+                $("#balanceTrf").val(sender.balance);
+
+                sender.balance = App.formatNumberSpace(sender.balance);
+                let current_row_sender = $("#tbListCustomers tbody").find('#tr_' + sender.id);
+                let updated_row_sender = $(tempCustomer(sender.id, sender.fullName, sender.email, sender.phone, sender.address, sender.balance))
+                current_row_sender.replaceWith (updated_row_sender);
+
+                recipient.balance = App.formatNumberSpace(recipient.balance);
+                let current_row_recipient = $("#tbListCustomers tbody").find('#tr_' + recipient.id);
+                let updated_row_recipient = $(tempCustomer(recipient.id, recipient.fullName, recipient.email, recipient.phone, recipient.address, recipient.balance))
+                current_row_recipient.replaceWith (updated_row_recipient);
+
+                $("#transferAmountTrf").val("");
+
+                App.showSuccessAlert("Successful transfer transaction !");
+                App.formatTooltip();
+
+            }).fail( (jqXHR) => {
+
+                $("#modalTransfer .modal-body .modal-alert-danger").empty();
+                $("#modalTransfer .modal-body .modal-alert-danger").removeClass("hide").addClass("show");
+
+                let str = ``;
+                if (jqXHR.responseJSON.message) {
+                    str += `<label id="message-error" class="error" for="message">${jqXHR.responseJSON.message}</label>`;
+                } else {
+                    $.each( jqXHR.responseJSON, function( key, value ) {
+                        str += `<label id="${key}Trf-error" class="error" for="${key}Trf">${value}</label>`;
+                        $("#" + key + "Trf").addClass("error");
+                    });
+                }
+
+                $("#modalTransfer .modal-body .modal-alert-danger").html(str);
+            });
+        });
+
+        $("a.create-modal").on("click", function () {
+            delete customer.id;
+            delete customer.balance;
+            showCreateModal();
+        });
+
+        $("#tbListCustomers").on("click", ".edit", function () {
+            customer.id = $(this).data('id');
+            $("#currentRow").val($(this).closest("tr").attr("id"));
+            showUpdateModal();
+        });
+
+        $("#tbListCustomers").on("click", ".deposit", function () {
+            deposit.customerId = $(this).data('id');
+            $("#currentRow").val($(this).closest("tr").attr("id"));
+            showDepositModal();
+        });
+
+        $("#tbListCustomers").on("click", ".withdraw", function () {
+            withdraw.customerId = $(this).data('id');
+            $("#currentRow").val($(this).closest("tr").attr("id"));
+            showWithdrawModal();
+        });
+
+        $("#tbListCustomers").on("click", ".transfer", function () {
+            transfer.senderId = $(this).data('id');
+            $("#currentRow").val($(this).closest("tr").attr("id"));
+            showTransferModal();
+        });
+
+        $("#transferAmountTrf").on("change", function () {
+            let transferAmount = $(this).val();
+            let fees = 10;
+            let feeAmount = transferAmount * fees / 100;
+            let transactionAmount = parseInt(transferAmount) + feeAmount;
+            $("#transactionAmountTrf").val(transactionAmount);
+        });
+
+        $("#tbListCustomers").on("click", ".suspended", function () {
+            customer.id = $(this).data('id');
+            $("#currentRow").val($(this).closest("tr").attr("id"));
+            showSuspendedModal();
+        });
+
+        $('#modalCreateCustomer').on('hidden.bs.modal', function () {
             $("#currentRow").val("");
-            $("#frmUpdateUser")[0].reset();
-            $("#frmUpdateUser").validate().resetForm();
-
-            App.showSuccessAlert("Data update successful !");
-            App.formatTooltip();
-
-            $('#modalUpdateUser').modal('hide');
-
-        }).fail( (jqXHR) => {
-            $("#modalUpdateUser .modal-body .modal-alert-danger").empty();
-            $("#modalUpdateUser .modal-body .modal-alert-danger").removeClass("hide").addClass("show");
-
-            let str = ``;
-            $.each( jqXHR.responseJSON, function( key, value ) {
-                str += `<label id="${key}Up-error" class="error" for="${key}Up">${value}</label>`;
-                $("#" + key + "Up").addClass("error");
-            });
-            $("#modalUpdateUser .modal-body .modal-alert-danger").html(str);
+            $("#modalCreateCustomer .modal-body .modal-alert-danger").empty();
+            $("#modalCreateCustomer .modal-body .modal-alert-danger").removeClass("show").addClass("hide");
+            $("#modalCreateCustomer input.error").removeClass("error");
+            $('#frmCreateCustomer')[0].reset();
+            $('#frmCreateCustomer').validate().resetForm();
         });
-    });
 
-    $("#btnCreateUser").on("click", function () {
-        delete user.id;
-
-        user.fullName = $("#fullName").val();
-
-        user.roleId = $("#role :selected").val();
-        user.phone = $("#phone").val();
-        user.username = $("#userName").val();
-        user.passwordHash = $("#password").val();
-
-        console.log(user);
-
-        $.ajax({
-            type: "POST",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            url: page.urls.saveNew,
-            data: JSON.stringify(user)
-        }).done( (data) => {
-            user = data;
-            console.log(user);
-            addRow();
-
-            App.showSuccessAlert("Successful data generation !");
-            App.formatTooltip();
-
-            $('#modalCreateUser').modal('hide');
-
-        }).fail( (jqXHR, textStatus, errorThrown) => {
-            $("#modalCreateUser .modal-body .modal-alert-danger").empty();
-            $("#modalCreateUser .modal-body .modal-alert-danger").removeClass("hide").addClass("show");
-
-            let str = ``;
-            $.each( jqXHR.responseJSON, function( key, value ) {
-                str += `<label id="${key}-error" class="error" for="${key}">${value}</label>`;
-                $("#" + key).addClass("error");
-            });
-            $("#modalCreateUser .modal-body .modal-alert-danger").html(str);
+        $('#modalUpdateCustomer').on('hidden.bs.modal', function () {
+            $("#currentRow").val("");
+            $("#modalUpdateCustomer .modal-body .modal-alert-danger").empty();
+            $("#modalUpdateCustomer .modal-body .modal-alert-danger").removeClass("show").addClass("hide");
+            $("#modalUpdateCustomer input.error").removeClass("error");
+            $('#frmUpdateCustomer')[0].reset();
+            $('#frmUpdateCustomer').validate().resetForm();
         });
-    });
 
-    function showDeleteModal() {
-        App.showDeleteConfirmDialog()
-            .then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        type: "DELETE",
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-
-                        url: "http://localhost:8080/api/users/delete/" + user.id,
-
-                    }).done( () => {
-                        App.showSuccessAlert("Succeeded client delete!");
-                        $("#tr_" + user.id).remove();
-                    }).fail( () => {
-                        App.showErrorAlert("An error occurred. Please try again later!");
-                    });
-                }
-            });
-    }
-
-    $("a.create-modal").on("click", function () {
-        delete user.id;
-        showCreateModal();
-    });
-
-    $("#tbListUsers").on("click", ".edit", function () {
-
-        user.id = $(this).data('id');
-        $("#currentRow").val($(this).closest("tr").attr("id"));
-        showUpdateModal();
-    });
-
-    $("#tbListUsers").on("click", ".delete", function () {
-        user.id = $(this).data('id');
-        $("#currentRow").val($(this).closest("tr").attr("id"));
-        showDeleteModal();
-    });
-
-    $('#modalCreateUser').on('hidden.bs.modal', function () {
-        $("#currentRow").val("");
-        $("#modalCreateUser .modal-body .modal-alert-danger").empty();
-        $("#modalCreateUser .modal-body .modal-alert-danger").removeClass("show").addClass("hide");
-        $("#modalCreateUser input.error").removeClass("error");
-        $('#frmCreateUser')[0].reset();
-        $('#frmCreateUser').validate().resetForm();
-    });
-
-    $('#modalUpdateUser').on('hidden.bs.modal', function () {
-        $("#currentRow").val("");
-        $("#modalUpdateUser .modal-body .modal-alert-danger").empty();
-        $("#modalUpdateUser .modal-body .modal-alert-danger").removeClass("show").addClass("hide");
-        $("#modalUpdateUser input.error").removeClass("error");
-        $('#frmUpdateUser')[0].reset();
-        $('#frmUpdateUser').validate().resetForm();
-    });
-
-    $(function () {
-        getUsers().then(function () {
-            drawOptionRoles();
-            drawOptionRolesUp();
-            $('[data-toggle="tooltip"]').tooltip();
+        $('#modalDeposit').on('hidden.bs.modal', function () {
+            $("#currentRow").val("");
+            $("#modalDeposit .modal-body .modal-alert-danger").empty();
+            $("#modalDeposit .modal-body .modal-alert-danger").removeClass("show").addClass("hide");
+            $("#modalDeposit input.error").removeClass("error");
+            $('#frmDeposit')[0].reset();
+            $('#frmDeposit').validate().resetForm();
         });
-    });
-    function showDeleteModal() {
-        App.showDeleteConfirmDialog()
-            .then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        type: "DELETE",
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
 
-                        url: "http://localhost:8080/api/users/delete/" + user.id,
+        $('#modalWithdraw').on('hidden.bs.modal', function () {
+            $("#currentRow").val("");
+            $("#modalWithdraw .modal-body .modal-alert-danger").empty();
+            $("#modalWithdraw .modal-body .modal-alert-danger").removeClass("show").addClass("hide");
+            $("#modalWithdraw input.error").removeClass("error");
+            $('#frmWithdraw')[0].reset();
+            $('#frmWithdraw').validate().resetForm();
+        });
 
-                    }).done( () => {
-                        App.showSuccessAlert("Succeeded client delete!");
-                        $("#tr_" + user.id).remove();
-                    }).fail( () => {
-                        App.showErrorAlert("An error occurred. Please try again later!");
-                    });
-                }
+        $('#modalTransfer').on('hidden.bs.modal', function () {
+            $("#currentRow").val("");
+            $("#modalTransfer .modal-body .modal-alert-danger").empty();
+            $("#modalTransfer .modal-body .modal-alert-danger").removeClass("show").addClass("hide");
+            $("#modalTransfer input.error").removeClass("error");
+            $('#frmTransfer')[0].reset();
+            $('#frmTransfer').validate().resetForm();
+        });
+
+        $(function () {
+            getCustomers().then(function () {
+                $("#frmDeposit .num-space").number(true, 0, ',', ' ');
+                $("#frmWithdraw .num-space").number(true, 0, ',', ' ');
+                $("#frmTransfer .num-space").number(true, 0, ',', ' ');
+                $('[data-toggle="tooltip"]').tooltip();
             });
-    }
-</script>
+        });
+    </script>
 
 </body>
 </html>

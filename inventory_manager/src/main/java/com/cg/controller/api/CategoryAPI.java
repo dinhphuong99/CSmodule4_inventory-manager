@@ -1,19 +1,23 @@
 package com.cg.controller.api;
 
 import com.cg.exception.DataInputException;
-import com.cg.exception.TiteExx;
+import com.cg.exception.EmailExistsException;
+import com.cg.exception.TitleCategoryExistsException;
 import com.cg.model.*;
 import com.cg.model.dto.*;
 import com.cg.service.category.CategoryService;
 import com.cg.utils.AppUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @RestController
@@ -61,10 +65,10 @@ public class CategoryAPI {
             return appUtils.mapErrorToResponse(bindingResult);
 
         try {
-            Optional<Category> category = categoryService.findByTitleCategoryAndIdIsNot(categoryDTO.getTitleCategory(), categoryDTO.getId());
+            Optional<Category> category = categoryService.findByTitleCategoryAndIdIsNot(categoryDTO.getTitleCategory(), 0L);
 
-            if (category.isPresent())
-                throw new TiteExx("Title category already exists");
+            if(category.isPresent())
+                throw new DataInputException("Title category already exists");
             return new ResponseEntity<>(categoryService.save(categoryDTO.toCategory()), HttpStatus.CREATED);
         } catch (Exception e) {
             throw new DataInputException("Data invalid");
@@ -77,18 +81,23 @@ public class CategoryAPI {
         if (bindingResult.hasErrors())
             return appUtils.mapErrorToResponse(bindingResult);
 
-        Optional<Category> category = categoryService.findByTitleCategoryAndIdIsNot(categoryDTO.getTitleCategory(), categoryDTO.getId());
+        try {
+            Optional<Category> category = categoryService.findByTitleCategoryAndIdIsNot(categoryDTO.getTitleCategory(), categoryDTO.getId());
 
-        if (!category.isPresent()) {
-            try {
-                return new ResponseEntity<>(categoryService.save(categoryDTO.toCategory()), HttpStatus.CREATED);
-            } catch (Exception e) {
-                throw new DataInputException("Data invalid");
-            }
+            if(category.isPresent())
+                throw new TitleCategoryExistsException("Title category already exists");
+            return new ResponseEntity<>(categoryService.save(categoryDTO.toCategory()), HttpStatus.CREATED);
+        } catch (Exception e) {
+            throw new DataInputException("Data invalid");
         }
-        else {
-            throw new DataInputException("Title category already exists");
-        }
+    }
+
+    @PostMapping("/update")
+    public Category update(@RequestBody Category category) {
+
+        Category categoryUpdated = categoryService.save(category);
+
+        return categoryUpdated;
     }
 
     @DeleteMapping("/delete/{id}")

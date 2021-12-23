@@ -97,7 +97,7 @@ public class OrderAPI {
         return orderUpdated;
     }
 
-    @GetMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Boolean> delete(@PathVariable Long id) {
 
         try {

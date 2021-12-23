@@ -32,14 +32,11 @@ public class UserDTO {
     @Column(unique = true)
     private String phone;
 
-    @Pattern(regexp = "(^[a-z0-9_-]{6,14}$)", message = "Formatter not true, ex: java_2-novice")
+    @Size(min = 1, max = 45, message = "Username description within 45 characters ! ")
     @Column(unique = true)
     private String username;
 
-    @Pattern(regexp = "(^(?=.*\\\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{8,20}$)",
-            message = "Formatter not true. Must have at least one numeric character, one lowercase character, \n" +
-                    "one uppercase character, one special symbol among @#$%\n" +
-                    "Password length should be between 8 and 20")
+    @Size(min = 8, max = 25, message = "Password 8 to 25 characters ! ")
     private String passwordHash;
 
     public User toUser() {

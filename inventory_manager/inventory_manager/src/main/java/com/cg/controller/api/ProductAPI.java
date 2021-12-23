@@ -65,10 +65,10 @@ public class ProductAPI {
             return appUtils.mapErrorToResponse(bindingResult);
 
         try {
-            Optional<Product> product = productService.findByTitleAndIdIsNot(productDTO.getTitle(), 0L);
+            Optional<Product> product = productService.findByTitleAndIdIsNot(productDTO.getTitle(), productDTO.getId());
 
             if(product.isPresent())
-                throw new DataInputException("Title already exists");
+                throw new TitleExistsException("Title already exists");
             Product product1 = productDTO.toProduct();
             Category category = productDTO.getCategory().toCategory();
 //            categoryService.save(category);
@@ -91,7 +91,7 @@ public class ProductAPI {
             Optional<Product> product = productService.findByTitleAndIdIsNot(productDTO.getTitle(), productDTO.getId());
 
             if(product.isPresent())
-                throw new DataInputException("Title already exists");
+                throw new TitleExistsException("Title already exists");
             Product product1 = productDTO.toProduct();
             Long categoryId = productDTO.getCategory().getId();
             Category category = categoryService.findCategoryDTOById(categoryId).toCategory();

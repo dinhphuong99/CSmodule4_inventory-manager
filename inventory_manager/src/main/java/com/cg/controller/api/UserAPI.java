@@ -66,13 +66,13 @@ public class UserAPI {
             Optional<User> user1 = userService.findByUsernameAndIdIsNot(userDTO.getUsername(), userDTO.getId());
 
             if(user.isPresent())
-                throw new PhoneExistsException("Phone already exists");
+                throw new DataInputException("Phone already exists");
 
             if(user1.isPresent())
-                throw new UserNameExistsException("User name already exists");
+                throw new DataInputException("User name already exists");
             return new ResponseEntity<>(userService.save(userDTO.toUser()), HttpStatus.CREATED);
         } catch (UserNameExistsException e) {
-            throw new UserNameExistsException("User name already exists");
+            throw new DataInputException("User name already exists");
         } catch (Exception e) {
             throw new DataInputException("Data invalid");
         }
@@ -86,14 +86,14 @@ public class UserAPI {
 
         try {
 
-            Optional<User> user = userService.findByPhoneAndIdIsNot(userDTO.getPhone(), userDTO.getId());
-            Optional<User> user1 = userService.findByUsernameAndIdIsNot(userDTO.getUsername(), userDTO.getId());
+            Optional<User> user = userService.findByPhoneAndIdIsNot(userDTO.getPhone(), 0L);
+            Optional<User> user1 = userService.findByUsernameAndIdIsNot(userDTO.getUsername(), 0L);
 
             if(user.isPresent())
-                throw new PhoneExistsException("Phone already exists");
+                throw new DataInputException("Phone already exists");
 
             if(user1.isPresent())
-                throw new UserNameExistsException("User name already exists");
+                throw new DataInputException("User name already exists");
             return new ResponseEntity<>(userService.save(userDTO.toUser()), HttpStatus.CREATED);
         } catch (Exception e) {
             throw new DataInputException("Data invalid");
@@ -108,7 +108,7 @@ public class UserAPI {
         return userUpdated;
     }
 
-    @GetMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Boolean> delete(@PathVariable Long id) {
 
         try{

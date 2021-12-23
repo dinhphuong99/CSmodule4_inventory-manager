@@ -5,7 +5,6 @@ class App {
     static BASE_URL_TRANSFER = this.DOMAIN + "/api/transfers";
     static BASE_URL_CATEGORY = this.DOMAIN + "/api/categories";
     static BASE_URL_PRODUCT = this.DOMAIN + "/api/products";
-    static BASE_URL_USER = this.DOMAIN + "/api/users";
 
     static showSuspendedConfirmDialog() {
         return Swal.fire({
@@ -195,30 +194,4 @@ class ReportProblem{
         this.item = item;
         this.createBy = createBy;
     }
-}
-
-class Role{
-    constructor(id, roleTitle) {
-        this.id = id;
-        this.roleTitle = roleTitle;
-    }
-}
-
-class Status{
-    constructor(id, statusTitle) {
-        this.id = id;
-        this.statusTitle = statusTitle;
-    }
-}
-
-const status = ["NEW", "BOOKED", "PAID", "CANCELLED"];
-
-const role = ["USER", "ADMIN"];
-
-function drawOptionStatus(temp){
-    let str =``;
-    for (let i = 1; i <= status.length; i++) {
-        str += `<option value="${i}">${status[i-1]}</option>`;
-    }
-    $(temp).html(str);
 }

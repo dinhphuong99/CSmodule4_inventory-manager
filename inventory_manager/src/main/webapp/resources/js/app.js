@@ -5,6 +5,8 @@ class App {
     static BASE_URL_TRANSFER = this.DOMAIN + "/api/transfers";
     static BASE_URL_CATEGORY = this.DOMAIN + "/api/categories";
     static BASE_URL_PRODUCT = this.DOMAIN + "/api/products";
+    static BASE_URL_USER = this.DOMAIN + "/api/users";
+    static BASE_URL_ORDER = this.DOMAIN + "/api/orders";
 
     static showSuspendedConfirmDialog() {
         return Swal.fire({
@@ -213,3 +215,11 @@ class Status{
 const status = ["NEW", "BOOKED", "PAID", "CANCELLED"];
 
 const role = ["USER", "ADMIN"];
+
+function drawOptionStatus(temp){
+    let str =``;
+    for (let i = 1; i <= status.length; i++) {
+        str += `<option value="${i}">${status[i-1]}</option>`;
+    }
+    $(temp).html(str);
+}

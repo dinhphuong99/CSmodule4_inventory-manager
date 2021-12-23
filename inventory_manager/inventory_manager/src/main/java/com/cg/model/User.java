@@ -31,18 +31,20 @@ public class User {
 
     @Pattern(regexp = "(^([AÀẢÃÁẠĂẰẮẲẴẶÂẤẦẨẪẬBCDĐEÈÉẺẼẸÊỀẾỂỄỆFGHIÍÌỈĨỊJKLMNOÒÓỎÕỌÔỒỐỔỖỘƠỜỚỞỠỢPQRSTUÙÚỦŨỤƯỪỨỬỮỰVWXYÝỲỶỸỴZ]+[aàảãáạăằẳẵắặâầẩẫấậbcdđeèẻẽéẹêềểễếệfghiìỉĩíịjklmnoòỏõóọôồổỗốộơờởỡớợpqrstuùủũúụưừửữứựvwxyỳỷỹýỵz]*?[ ]?)+$)",
             message = "Name format not true, Ex example : Nguyễn Văn An ")
-    @Size(min = 1, max = 45, message = "Full name description within 45 characters ! ")
+    @Size(min = 1, max = 45, message = "Full name description within 255 characters ! ")
     private String fullName;
 
     @Pattern(regexp = "(^$|[0][0-9]{9,10}$)", message = "Formatter not true, phone number is have 10-11 character ! ")
     @Column(unique = true)
     private String phone;
 
-    @Size(min = 1, max = 45, message = "Username description within 45 characters ! ")
+    @Pattern(regexp = "(^(?=.*\\\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{8,20}$)",
+            message = "Formatter not true. Must have at least one numeric character, one lowercase character, \n" +
+                    "one uppercase character, one special symbol among @#$%\n" +
+                    "Password length should be between 8 and 20")
     @Column(unique = true)
     private String username;
 
-    @Size(min = 8, max = 25, message = "Password 8 to 25 characters ! ")
     private String passwordHash;
 
 
