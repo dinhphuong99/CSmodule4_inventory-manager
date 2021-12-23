@@ -49,7 +49,7 @@
                 getAllCategories: App.BASE_URL_CATEGORY,
                 getCategoryById: App.BASE_URL_CATEGORY + '/',
                 saveNew: App.BASE_URL_CATEGORY + '/create/',
-                saveEdit: App.BASE_URL_CATEGORY + '/update/',
+                saveEdit: App.BASE_URL_CATEGORY + '/update',
                 doDelete: App.BASE_URL_CATEGORY + '/delete/'
             }
         }
@@ -98,7 +98,7 @@
                     assignUpdateModal();
 
                 }).fail(function() {
-                    App.showErrorAlert("An error occurred. Please try again later ! Edit1");
+                    App.showErrorAlert("An error occurred. Please try again later !");
                 });
             }
         }
@@ -163,7 +163,9 @@
         });
 
         $("#btnUpdateCategory").on("click", function () {
-            category.titleCategory = $("#titleCategory").val();
+            category.titleCategory = $("#upTitleCategory").val();
+
+            console.log(category);
 
             $.ajax({
                 type: "PUT",
@@ -190,6 +192,7 @@
                 $('#modalUpdateCategory').modal('hide');
 
             }).fail( (jqXHR) => {
+
                 $("#modalUpdateCategory .modal-body .modal-alert-danger").empty();
                 $("#modalUpdateCategory .modal-body .modal-alert-danger").removeClass("hide").addClass("show");
 

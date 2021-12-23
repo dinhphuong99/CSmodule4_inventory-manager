@@ -27,6 +27,7 @@
                     <tr>
                         <th>#</th>
                         <th>Title product</th>
+                        <th>Title category</th>
                         <th colspan="2">Action</th>
                     </tr>
                 </thead>
@@ -60,7 +61,7 @@
         let tempProduct = jQuery.validator.format($.trim($("#tempProduct").val()));
 
         let addRow = () => {
-            $("#tbListProducts tbody").prepend($(tempProduct(product.id, product.title)));
+            $("#tbListProducts tbody").prepend($(tempProduct(product.id, product.title, category.titleCategory)));
         }
 
         function getProducts() {
@@ -68,13 +69,14 @@
             return $.ajax({
                 type: "GET",
                 // url: page.urls.getAllProducts,
-                url: "http://localhost:8080/api/products",
+                url: "http://localhost:8080/api/products"
             }).done((data) => {
                 data = data.sort(function (prod1, prod2) {
                     return prod1.id - prod2.id;
                 });
                 $.each(data, (index, item) => {
                     product = item;
+                    category = product.category;
                     addRow();
                 });
             }).fail(function() {
@@ -90,10 +92,37 @@
                 data = data.sort(function (cat1, cat2) {
                     return cat1.id - cat2.id;
                 });
+                let str = ``;
                 $.each(data, (index, item) => {
                     category = item;
-                    addRow();
+                    // addRow();
+                    str += `
+                        <option value="${category.id}">${category.titleCategory}</option>
+                        `;
                 });
+                $("#category").html(str);
+            }).fail(function() {
+                App.showErrorAlert("An error occurred. Please try again later !");
+            });
+        }
+
+        function getCategoriesUp() {
+            return $.ajax({
+                type: "GET",
+                url: page.urls.getAllCategories,
+            }).done((data) => {
+                data = data.sort(function (cat1, cat2) {
+                    return cat1.id - cat2.id;
+                });
+                let str = ``;
+                $.each(data, (index, item) => {
+                    category = item;
+                    // addRow();
+                    str += `
+                        <option value="${category.id}">${category.titleCategory}</option>
+                        `;
+                });
+                $("#upCategory").html(str);
             }).fail(function() {
                 App.showErrorAlert("An error occurred. Please try again later !");
             });
@@ -104,7 +133,7 @@
         }
 
         function showUpdateModal() {
-            
+
             if (product.id == null) {
                 $('#modalUpdateProduct').modal('hide');
                 $('#frmUpdateProduct')[0].reset();
@@ -114,16 +143,19 @@
                     url: page.urls.getProductById + product.id,
                 }).done((resp) => {
                     product = resp;
+                    category = product.category;
                     assignUpdateModal();
 
                 }).fail(function() {
-                    App.showErrorAlert("An error occurred. Please try again later ! Edit1");
+                    App.showErrorAlert("An error occurred. Please try again later !");
                 });
             }
         }
 
         function assignUpdateModal() {
             $("#upTitle").val(product.title);
+            $("#upCategory").val(category.id);
+            $("#upCategory :selected").text(category.titleCategory);
             $('#modalUpdateProduct').modal('show');
         }
 
@@ -137,7 +169,9 @@
                                 'Accept': 'application/json',
                                 'Content-Type': 'application/json'
                             },
-                            url: page.urls.doDelete + product.id
+
+                            url: "http://localhost:8080/api/products/delete/" + product.id,
+
                         }).done( () => {
                             App.showSuccessAlert("Succeeded client delete!");
                             $("#tr_" + product.id).remove();
@@ -153,23 +187,12 @@
             delete category.id;
             delete product.id;
 
-            $.ajax({
-                type: "GET",
-                url: page.urls.getAllCategories,
-            }).done((data) => {
-                data = data.sort(function (cat1, cat2) {
-                    return cat1.id - cat2.id;
-                });
-                $.each(data, (index, item) => {
-                    category = item;
-                    category.id = $("#idCategory").val();
-                    category.titleCategory = $("#titleCategory :selected").text();
-                });
-            }).fail(function() {
-                App.showErrorAlert("An error occurred. Please try again later !");
-            });
-
             product.title = $("#title").val();
+            category.id = $("#category").val();
+            category.titleCategory = $("#category :selected").text();
+            product.category = category;
+
+            console.log(product);
 
             $.ajax({
                 type: "POST",
@@ -181,6 +204,7 @@
                 data: JSON.stringify(product)
             }).done( (data) => {
                 product = data;
+                console.log(product);
                 addRow();
 
                 App.showSuccessAlert("Successful data generation !");
@@ -202,7 +226,13 @@
         });
 
         $("#btnUpdateProduct").on("click", function () {
-            product.title = $("#title").val();
+
+            product.title = $("#upTitle").val();
+            category.id = $("#upCategory").val();
+            category.titleCategory = $("#upCategory :selected").text();
+            product.category = category;
+
+            // console.log(product);
 
             $.ajax({
                 type: "PUT",
@@ -214,9 +244,10 @@
                 data: JSON.stringify(product)
             }).done( (resp) => {
                 product = resp;
+                category = product.category;
 
                 let current_row = $("#tbListProducts tbody").find('#' + $("#currentRow").val());
-                let updated_row = $(tempProduct(product.id, product.title))
+                let updated_row = $(tempProduct(product.id, product.title, category.titleCategory))
                 current_row.replaceWith (updated_row);
 
                 $("#currentRow").val("");
@@ -247,9 +278,10 @@
         });
 
         $("#tbListProducts").on("click", ".edit", function () {
+
             product.id = $(this).data('id');
             $("#currentRow").val($(this).closest("tr").attr("id"));
-
+            alert("OK");
             showUpdateModal();
         });
 
@@ -279,10 +311,12 @@
 
         $(function () {
             getProducts().then(function () {
-
+                getCategories();
+                getCategoriesUp();
                 $('[data-toggle="tooltip"]').tooltip();
             });
         });
+
     </script>
 
 </body>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>User management</title>
+    <th:block th:replace="/layout/head :: head" />
+</head>
+<body>
+<div class="container">
+    <div class="table-title">
+        <div class="row">
+            <div class="col-sm-5">
+                <h1>List of user</h1>
+            </div>
+            <div class="col-sm-7">
+                <a class="btn btn-outline-light create-modal"><i class="fa fa-plus-square-o" aria-hidden="true"></i> <span>Add New User</span></a>
+            </div>
+        </div>
+    </div>
+    <div class="box-body">
+
+        <th:block th:replace="/user/frm_list_table.html::list-users" />
+
+        <input type="hidden" id="currentRow"/>
+
+        <table id="tbListUsers" class="table table-hover">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Role</th>
+                <th>Full Name</th>
+                <th>Phone</th>
+                <th>Username</th>
+                <th>Password</th>
+                <th colspan="2">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<th:block th:replace="/user/frm_create :: frm-create" />
+
+<th:block th:replace="/user/frm_update :: frm-update" />
+
+<th:block th:replace="/layout/script :: script" />
+
+<script>
+    let page = {
+        urls: {
+            getAllCategories: App.BASE_URL_CATEGORY,
+            getAllUsers: App.BASE_URL_USER,
+            getUserById: App.BASE_URL_USER + '/',
+            saveNew: App.BASE_URL_USER + '/create/',
+            saveEdit: App.BASE_URL_USER + '/update/',
+            doDelete: App.BASE_URL_USER + '/delete/'
+        }
+    }
+
+    let user = new User();
+
+    let tempUser = jQuery.validator.format($.trim($("#tempUser").val()));
+
+    let addRow = () => {
+
+        $("#tbListUsers tbody").prepend($(tempUser(user.id, role[user.roleId - 1], user.fullName, user.phone, user.username, user.passwordHash)));
+    }
+
+    function getUsers() {
+
+        return $.ajax({
+            type: "GET",
+            // url: page.urls.getAllUsers,
+            url: "http://localhost:8080/api/users"
+        }).done((data) => {
+            data = data.sort(function (prod1, prod2) {
+                return prod1.id - prod2.id;
+            });
+            $.each(data, (index, item) => {
+                user = item;
+                addRow();
+            });
+        }).fail(function() {
+            App.showErrorAlert("An error occurred. Please try again later !");
+        });
+    }
+
+    function drawOptionRoles(){
+        let str =``;
+        for (let i = 1; i <= role.length; i++) {
+            str += `<option value="${i}">${role[i-1]}</option>`;
+        }
+        $("#role").html(str);
+    }
+
+    function drawOptionRolesUp(){
+        let str =``;
+        for (let i = 1; i <= role.length; i++) {
+            str += `<option value="${i}">${role[i-1]}</option>`;
+        }
+        $("#roleUp").html(str);
+    }
+
+    function showCreateModal() {
+        $('#modalCreateUser').modal('show');
+    }
+
+    function showUpdateModal() {
+
+        if (user.id == null) {
+            $('#modalUpdateUser').modal('hide');
+            $('#frmUpdateUser')[0].reset();
+        } else {
+            $.ajax({
+                type: "GET",
+                url: page.urls.getUserById + user.id,
+            }).done((resp) => {
+                user = resp;
+                assignUpdateModal();
+
+            }).fail(function() {
+                App.showErrorAlert("An error occurred. Please try again later !");
+            });
+        }
+    }
+
+    function assignUpdateModal() {
+        $("#fullNameUp").val(user.fullName);
+
+        $("#roleUp :selected").val(user.roleId);
+        $("#phoneUp").val(user.phone);
+        $("#userNameUp").val(user.username);
+        $("#passwordUp").val(user.passwordHash);
+        $('#modalUpdateUser').modal('show');
+    }
+
+    $("#btnUpdateUser").on("click", function () {
+        user.fullName = $("#fullNameUp").val();
+        user.roleId = $("#roleUp").val();
+        user.roleId = $("#roleUp :selected").val();
+        user.phone = $("#phoneUp").val();
+        user.username = $("#userNameUp").val();
+        user.passwordHash = $("#passwordUp").val();
+
+        $.ajax({
+            type: "PUT",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            url: page.urls.saveEdit,
+            data: JSON.stringify(user)
+        }).done( (resp) => {
+            user = resp;
+
+            let current_row = $("#tbListUsers tbody").find('#' + $("#currentRow").val());
+            let updated_row = $(tempUser(user.id, role[user.roleId - 1], user.fullName, user.phone, user.username, user.passwordHash))
+            current_row.replaceWith (updated_row);
+
+            $("#currentRow").val("");
+            $("#frmUpdateUser")[0].reset();
+            $("#frmUpdateUser").validate().resetForm();
+
+            App.showSuccessAlert("Data update successful !");
+            App.formatTooltip();
+
+            $('#modalUpdateUser').modal('hide');
+
+        }).fail( (jqXHR) => {
+            $("#modalUpdateUser .modal-body .modal-alert-danger").empty();
+            $("#modalUpdateUser .modal-body .modal-alert-danger").removeClass("hide").addClass("show");
+
+            let str = ``;
+            $.each( jqXHR.responseJSON, function( key, value ) {
+                str += `<label id="${key}Up-error" class="error" for="${key}Up">${value}</label>`;
+                $("#" + key + "Up").addClass("error");
+            });
+            $("#modalUpdateUser .modal-body .modal-alert-danger").html(str);
+        });
+    });
+
+    $("#btnCreateUser").on("click", function () {
+        delete user.id;
+
+        user.fullName = $("#fullName").val();
+
+        user.roleId = $("#role :selected").val();
+        user.phone = $("#phone").val();
+        user.username = $("#userName").val();
+        user.passwordHash = $("#password").val();
+
+        console.log(user);
+
+        $.ajax({
+            type: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            url: page.urls.saveNew,
+            data: JSON.stringify(user)
+        }).done( (data) => {
+            user = data;
+            console.log(user);
+            addRow();
+
+            App.showSuccessAlert("Successful data generation !");
+            App.formatTooltip();
+
+            $('#modalCreateUser').modal('hide');
+
+        }).fail( (jqXHR, textStatus, errorThrown) => {
+            $("#modalCreateUser .modal-body .modal-alert-danger").empty();
+            $("#modalCreateUser .modal-body .modal-alert-danger").removeClass("hide").addClass("show");
+
+            let str = ``;
+            $.each( jqXHR.responseJSON, function( key, value ) {
+                str += `<label id="${key}-error" class="error" for="${key}">${value}</label>`;
+                $("#" + key).addClass("error");
+            });
+            $("#modalCreateUser .modal-body .modal-alert-danger").html(str);
+        });
+    });
+
+    function showDeleteModal() {
+        App.showDeleteConfirmDialog()
+            .then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "DELETE",
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+
+                        url: "http://localhost:8080/api/users/delete/" + user.id,
+
+                    }).done( () => {
+                        App.showSuccessAlert("Succeeded client delete!");
+                        $("#tr_" + user.id).remove();
+                    }).fail( () => {
+                        App.showErrorAlert("An error occurred. Please try again later!");
+                    });
+                }
+            });
+    }
+
+    $("a.create-modal").on("click", function () {
+        delete user.id;
+        showCreateModal();
+    });
+
+    $("#tbListUsers").on("click", ".edit", function () {
+
+        user.id = $(this).data('id');
+        $("#currentRow").val($(this).closest("tr").attr("id"));
+        showUpdateModal();
+    });
+
+    $("#tbListUsers").on("click", ".delete", function () {
+        user.id = $(this).data('id');
+        $("#currentRow").val($(this).closest("tr").attr("id"));
+        showDeleteModal();
+    });
+
+    $('#modalCreateUser').on('hidden.bs.modal', function () {
+        $("#currentRow").val("");
+        $("#modalCreateUser .modal-body .modal-alert-danger").empty();
+        $("#modalCreateUser .modal-body .modal-alert-danger").removeClass("show").addClass("hide");
+        $("#modalCreateUser input.error").removeClass("error");
+        $('#frmCreateUser')[0].reset();
+        $('#frmCreateUser').validate().resetForm();
+    });
+
+    $('#modalUpdateUser').on('hidden.bs.modal', function () {
+        $("#currentRow").val("");
+        $("#modalUpdateUser .modal-body .modal-alert-danger").empty();
+        $("#modalUpdateUser .modal-body .modal-alert-danger").removeClass("show").addClass("hide");
+        $("#modalUpdateUser input.error").removeClass("error");
+        $('#frmUpdateUser')[0].reset();
+        $('#frmUpdateUser').validate().resetForm();
+    });
+
+    $(function () {
+        getUsers().then(function () {
+            drawOptionRoles();
+            drawOptionRolesUp();
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    });
+    function showDeleteModal() {
+        App.showDeleteConfirmDialog()
+            .then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "DELETE",
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+
+                        url: "http://localhost:8080/api/users/delete/" + user.id,
+
+                    }).done( () => {
+                        App.showSuccessAlert("Succeeded client delete!");
+                        $("#tr_" + user.id).remove();
+                    }).fail( () => {
+                        App.showErrorAlert("An error occurred. Please try again later!");
+                    });
+                }
+            });
+    }
+</script>
+
+</body>
+</html>
