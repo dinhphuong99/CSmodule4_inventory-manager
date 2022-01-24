@@ -6,41 +6,39 @@
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <!--                    .setContent(content)-->
-                    <!--                    .setCreateAt(createAt)-->
-                    <!--                    .setUser(user.toUserDTO())-->
-                    <!--                    .setStatus(status)-->
-                    <!--                    .setTotalFee(totalFee);-->
                     <h5 class="modal-title">Order information</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="modal-alert-danger hide"></div>
-
-                    <form id="frmCreateUser" method="post">
+                    <form id="frmCreateOrder" method="post">
                         <fieldset class="row g-3">
                             <div class="col-md-4">
-                                <label class="form-label">User</label>
-                                <select id="user" class="select form-control">
-                                </select>
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="form-label">Status</label>
-                                <select id="status" class="select form-control">
-                                </select>
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="fullName" name="fullName" data-rule-required="true"
+                                       data-msg-required="Full Name is required">
                             </div>
 
                             <div class="col-md-4">
-                                <label class="form-label">Content</label>
-                                <input type="text" class="form-control" id="c" name="content" data-rule-required="true"
-                                       data-msg-required="Content is required">
+                                <label class="form-label">Phone</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" data-rule-required="true"
+                                       data-msg-required="Full Name is required">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Ordername</label>
+                                <input type="text" class="form-control" id="Ordername" name="Ordername" data-rule-required="true"
+                                       data-msg-required="Full Name is required">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Password</label>
+                                <input type="password" class="form-control" id="passwordHash" name="passwordHash" data-rule-required="true"
+                                       data-msg-required="Password is required">
                             </div>
 
-                            <div class="col-md-3">
-                                <label class="form-label">Total Fee</label>
-                                <input type="number" class="form-control" id="totalFee" name="totalFee" data-rule-required="true"
-                                       data-msg-required="TotalFee is required">
+                            <div class="col-md-4">
+                                <label class="form-label">Role</label>
+                                <select id="roleId" class="select form-control">
+                                </select>
                             </div>
                         </fieldset>
                     </form>
@@ -50,7 +48,7 @@
 
                     <button type="button" id="btnCreateOrder" class="btn btn-outline-primary">
                         <i class="fa fa-plus" aria-hidden="true"></i>
-                        Create order
+                        Create Order
                     </button>
                 </div>
             </div>

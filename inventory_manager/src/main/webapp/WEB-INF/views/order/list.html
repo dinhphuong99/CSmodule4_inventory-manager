@@ -5,371 +5,352 @@
     <th:block th:replace="/layout/head :: head" />
 </head>
 <body>
-<div class="container">
-    <div class="table-title">
-        <div class="row">
-            <div class="col-sm-5">
-                <h1>List of order</h1>
-            </div>
-            <div class="col-sm-7">
-                <a class="btn btn-outline-light create-modal"><i class="fa fa-plus-square-o" aria-hidden="true"></i> <span>Add New Order</span></a>
+    <div class="container">
+        <div class="table-title">
+            <div class="row">
+                <div class="col-sm-5">
+                    <h1>List of order</h1>
+                </div>
+                <div class="col-sm-7">
+                    <a class="btn btn-outline-light create-modal"><i class="fa fa-plus-square-o" aria-hidden="true"></i> <span>Add New Order</span></a>
+                </div>
             </div>
         </div>
+        <div class="box-body">
+
+            <th:block th:replace="/order/frm_list_table.html::list-orders" />
+
+            <input type="hidden" id="currentRow"/>
+
+            <table id="tbListOrders" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Content</th>
+                        <th>CreateAt</th>
+                        <th>Status</th>
+                        <th>TotalFee</th>
+                        <th>Phone</th>
+                        <th colspan="2">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+
+        </div>
     </div>
-    <div class="box-body">
 
-        <th:block th:replace="/order/frm_list_table.html::list-orders" />
+    <th:block th:replace="/order/frm_create :: frm-create" />
 
-        <input type="hidden" id="currentRow"/>
+    <th:block th:replace="/order/frm_update :: frm-update" />
 
-        <table id="tbListOrders" class="table table-hover">
-            <thead>
-            <tr>
-                <th>#</th>
-                <th>Full Name</th>
-                <th>Status</th>
-                <th>Total Fee</th>
-                <th>Create At</th>
-                <th>Content</th>
-                <th colspan="2">Action</th>
-            </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
+    <th:block th:replace="/layout/script :: script" />
 
-    </div>
-</div>
-
-<th:block th:replace="/order/frm_create :: frm-create" />
-
-<th:block th:replace="/order/frm_update :: frm-update" />
-
-<th:block th:replace="/layout/script :: script" />
-
-<script>
-    let page = {
-        urls: {
-            getAllOrders: App.BASE_URL_ORDER,
-            getOrderById: App.BASE_URL_ORDER + '/',
-            saveNew: App.BASE_URL_ORDER + '/create/',
-            saveEdit: App.BASE_URL_ORDER + '/update/',
-            doDelete: App.BASE_URL_ORDER + '/delete/'
+    <script>
+        let page = {
+            urls: {
+                getAllOrders: App.BASE_URL_ORDER,
+                getOrderById: App.BASE_URL_ORDER + '/',
+                getUserById: App.BASE_URL_USER + '/',
+                saveNew: App.BASE_URL_ORDER + '/create/',
+                saveEdit: App.BASE_URL_ORDER + '/update/',
+                doDelete: App.BASE_URL_ORDER + '/delete/'
+            }
         }
-    }
 
-    let order = new Order();
-    let user = new User();
+        let order = new Order();
+        let user = new User();
+        let tempOrder = jQuery.validator.format($.trim($("#tempOrder").val()));
 
-    let tempOrder = jQuery.validator.format($.trim($("#tempOrder").val()));
-
-    let addRow = () => {
-        user = order.user;
-        $("#tbListOrders tbody").prepend($(tempOrder(order.id, user.fullName, status[order.status - 1], order.totalFee, order.createAt, order.content)));
-    }
-
-    function getOrders() {
-
-        return $.ajax({
-            type: "GET",
-            // url: page.urls.getAllOrders,
-            url: "http://localhost:8080/api/orders"
-        }).done((data) => {
-            data = data.sort(function (prod1, prod2) {
-                return prod1.id - prod2.id;
-            });
-            $.each(data, (index, item) => {
-                order = item;
-                addRow();
-            });
-        }).fail(function() {
-            App.showErrorAlert("An error occurred. Please try again later !");
-        });
-    }
-
-    function getUsers() {
-
-        return $.ajax({
-            type: "GET",
-            // url: page.urls.getAllOrders,
-            url: "http://localhost:8080/api/users"
-        }).done((data) => {
-            data = data.sort(function (prod1, prod2) {
-                return prod1.id - prod2.id;
-            });
-            $.each(data, (index, item) => {
-                user = item;
-                str += `
-                        <option value="${user.id}">${user.id} ${user.fullName}</option>
-                        `;
-            });
-            $("#user").html(str);
-        }).fail(function() {
-            App.showErrorAlert("An error occurred. Please try again later !");
-        });
-    }
-
-    function getUsersUp() {
-
-        return $.ajax({
-            type: "GET",
-            // url: page.urls.getAllOrders,
-            url: "http://localhost:8080/api/users"
-        }).done((data) => {
-            data = data.sort(function (prod1, prod2) {
-                return prod1.id - prod2.id;
-            });
-            $.each(data, (index, item) => {
-                user = item;
-                str += `
-                        <option value="${user.id}">${user.id} ${user.fullName}</option>
-                        `;
-            });
-            $("#userUp").html(str);
-        }).fail(function() {
-            App.showErrorAlert("An error occurred. Please try again later !");
-        });
-    }
-
-    function drawOptionStatus(){
-        let str =``;
-        for (let i = 1; i <= status.length; i++) {
-            str += `<option value="${i}">${status[i-1]}</option>`;
+        let addRow = () => {
+            <!--                id, content, createAt, status, totalFee, user_id-->
+            user = order.user;
+            $("#tbListOrders tbody").prepend($(tempOrder(order.id, order.content, order.createAt, status[order.id - 1], order.totalFee, user.phone)));
         }
-        $("#status").html(str);
-    }
 
-    function drawOptionStatusUp(){
-        let str =``;
-        for (let i = 1; i <= status.length; i++) {
-            str += `<option value="${i}">${status[i-1]}</option>`;
-        }
-        $("#statusUp").html(str);
-    }
+        function getOrders() {
 
-    function showCreateModal() {
-        $('#modalCreateOrder').modal('show');
-    }
-
-    function showUpdateModal() {
-
-        if (order.id == null) {
-            $('#modalUpdateOrder').modal('hide');
-            $('#frmUpdateOrder')[0].reset();
-        } else {
-            $.ajax({
+            return $.ajax({
                 type: "GET",
-                url: page.urls.getOrderById + order.id,
-            }).done((resp) => {
-                order = resp;
-                assignUpdateModal();
-
+                // url: page.urls.getAllProducts,
+                url: "http://localhost:8080/api/orders"
+            }).done((data) => {
+                data = data.sort(function (order1, order2) {
+                    return order1.id - order2.id;
+                });
+                $.each(data, (index, item) => {
+                    order = item;
+                    addRow();
+                });
             }).fail(function() {
                 App.showErrorAlert("An error occurred. Please try again later !");
             });
         }
-    }
 
-    function assignUpdateModal() {
-        $("#userUp").val(user.id);
-        $("#userUp :selected").text(user.id +" "+user.fullName);
-        $("#statusUp :selected").val(order.status);
-        $("#totalFeeUp").val(order.totalFee);
-        $("#contentUp").val(order.content);
-        $('#modalUpdateOrder').modal('show');
-    }
+        function showCreateModal() {
+            $('#modalCreateOrder').modal('show');
+        }
 
-    function assignUpdateModalSave() {
-        // user.id = $("#userUp").val();
-        user.id = $("#userUp :selected").val();
+        function showUpdateModal() {
 
-        order.status = $("#statusUp :selected").val();
-        order.totalFee = $("#totalFeeUp").val();
-        order.content = $("#contentUp").val();
-        order.user = user;
+            if (order.id == null) {
+                $('#modalUpdateOrder').modal('hide');
+                $('#frmUpdateOrder')[0].reset();
+            } else {
+                $.ajax({
+                    type: "GET",
+                    url: page.urls.getOrderById + order.id,
+                }).done((resp) => {
+                    order = resp;
+                    user = order.user;
+                    assignUpdateModal();
+                }).fail(function() {
+                    App.showErrorAlert("An error occurred. Please try again later !");
+                });
+            }
+        }
 
-        $('#modalUpdateOrder').modal('show');
-    }
+        function assignUpdateModal() {
+            <!--                id, content, createAt, status, totalFee, user_id-->
+            $("#upContent").val(order.content);
+            $("#upCreateAt").val(order.createAt);
+            $("#upStatus").val(order.status);
+            order.totalFee = 0;
+            $("#upUserId").val(user.id);
+            $('#modalUpdateOrder').modal('show');
+        }
 
-    function assignCreateModal() {
-        delete order.id;
+        function showDeleteModal() {
+            App.showDeleteConfirmDialog()
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            type: "DELETE",
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            },
 
-        user.id = $("#user :selected").val();
+                            url: "http://localhost:8080/api/orders/delete/" + order.id,
 
-        order.status = $("#status :selected").val();
-        order.totalFee = $("#totalFee").val();
-        order.content = $("#content").val();
+                        }).done( () => {
+                            App.showSuccessAlert("Succeeded delete!");
+                            $("#tr_" + order.id).remove();
+                        }).fail( () => {
+                            App.showErrorAlert("An error occurred. Please try again later!");
+                        });
+                    }
+                });
+        }
 
-        console.log(order);
-    }
+        $("#btnCreateOrder").on("click", function () {
 
-    $("#btnUpdateOrder").on("click", function () {
-        assignUpdateModalSave();
+            delete order.id;
 
-        $.ajax({
-            type: "PUT",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            url: page.urls.saveEdit,
-            data: JSON.stringify(order)
-        }).done( (resp) => {
-            order = resp;
+            order.content = $("#content").val();
+            order.createAt = $("#createAt").val();
+            order.status = $("#status").val();
+            order.totalFee = 0;
+            let userId = $("#userId").val();
 
-            let current_row = $("#tbListOrders tbody").find('#' + $("#currentRow").val());
-            let updated_row = $(tempOrder(order.id, order.user, status[order.status - 1], order.totalFee, order.createAt, order.content))
-            current_row.replaceWith (updated_row);
+            $.ajax({
+                type: "GET",
+                url: page.urls.getUserById + userId,
+            }).done((resp) => {
+                user = resp;
+                order.user = user;
+            }).fail(function() {
+                App.showErrorAlert("An error occurred. Please try again later !");
+            });
 
+            $.ajax({
+                type: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                url: page.urls.saveNew,
+                data: JSON.stringify(order)
+            }).done( (data) => {
+                order = data;
+                addRow();
+
+                App.showSuccessAlert("Successful data generation !");
+                App.formatTooltip();
+
+                $('#modalCreateOrder').modal('hide');
+
+            }).fail( (jqXHR, textStatus, errorThrown) => {
+                $("#modalCreateOrder .modal-body .modal-alert-danger").empty();
+                $("#modalCreateOrder .modal-body .modal-alert-danger").removeClass("hide").addClass("show");
+
+                let str = ``;
+                $.each( jqXHR.responseJSON, function( key, value ) {
+                    str += `<label id="${key}-error" class="error" for="${key}">${value}</label>`;
+                    $("#" + key).addClass("error");
+                });
+                $("#modalCreateOrder .modal-body .modal-alert-danger").html(str);
+            });
+        });
+
+        $("#btnUpdateOrder").on("click", function () {
+
+            order.fullName = $("#upFullName").val();
+            order.phone = $("#upPhone").val();
+            order.ordername = $("#uporderName").val();
+            order.passwordHash = $("#upPasswordHash").val();
+            order.roleId = $("#upRoleId").val();
+
+            $.ajax({
+                type: "PUT",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                url: page.urls.saveEdit,
+                data: JSON.stringify(order)
+            }).done( (resp) => {
+                order = resp;
+                user = order.user;
+
+                let current_row = $("#tbListOrders tbody").find('#' + $("#currentRow").val());
+                let updated_row = $(tempOrder(order.id, order.content, order.createAt, status[order.id - 1], order.totalFee, user.phone))
+                current_row.replaceWith (updated_row);
+
+                $("#currentRow").val("");
+                $("#frmUpdateOrder")[0].reset();
+                $("#frmUpdateOrder").validate().resetForm();
+
+                App.showSuccessAlert("Data update successful !");
+                App.formatTooltip();
+
+                $('#modalUpdateOrder').modal('hide');
+
+            }).fail( (jqXHR) => {
+                $("#modalUpdateOrder .modal-body .modal-alert-danger").empty();
+                $("#modalUpdateOrder .modal-body .modal-alert-danger").removeClass("hide").addClass("show");
+
+                let str = ``;
+                $.each( jqXHR.responseJSON, function( key, value ) {
+                    str += `<label id="${key}Up-error" class="error" for="${key}Up">${value}</label>`;
+                    $("#" + key + "Up").addClass("error");
+                });
+                $("#modalUpdateOrder .modal-body .modal-alert-danger").html(str);
+            });
+        });
+
+        $("a.create-modal").on("click", function () {
+            delete order.id;
+            showCreateModal();
+        });
+
+        $("#tbListOrders").on("click", ".edit", function () {
+
+            order.id = $(this).data('id');
+            $("#currentRow").val($(this).closest("tr").attr("id"));
+            showUpdateModal();
+        });
+
+        $("#tbListOrders").on("click", ".delete", function () {
+            order.id = $(this).data('id');
+            $("#currentRow").val($(this).closest("tr").attr("id"));
+            showDeleteModal();
+        });
+
+        $('#modalCreateOrder').on('hidden.bs.modal', function () {
             $("#currentRow").val("");
-            $("#frmUpdateOrder")[0].reset();
-            $("#frmUpdateOrder").validate().resetForm();
-
-            App.showSuccessAlert("Data update successful !");
-            App.formatTooltip();
-
-            $('#modalUpdateOrder').modal('hide');
-
-        }).fail( (jqXHR) => {
-            $("#modalUpdateOrder .modal-body .modal-alert-danger").empty();
-            $("#modalUpdateOrder .modal-body .modal-alert-danger").removeClass("hide").addClass("show");
-
-            let str = ``;
-            $.each( jqXHR.responseJSON, function( key, value ) {
-                str += `<label id="${key}Up-error" class="error" for="${key}Up">${value}</label>`;
-                $("#" + key + "Up").addClass("error");
-            });
-            $("#modalUpdateOrder .modal-body .modal-alert-danger").html(str);
-        });
-    });
-
-    $("#btnCreateOrder").on("click", function () {
-        assignCreateModal();
-
-        $.ajax({
-            type: "POST",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            url: page.urls.saveNew,
-            data: JSON.stringify(order)
-        }).done( (data) => {
-            order = data;
-            console.log(order);
-            addRow();
-
-            App.showSuccessAlert("Successful data generation !");
-            App.formatTooltip();
-
-            $('#modalCreateOrder').modal('hide');
-
-        }).fail( (jqXHR, textStatus, errorThrown) => {
             $("#modalCreateOrder .modal-body .modal-alert-danger").empty();
-            $("#modalCreateOrder .modal-body .modal-alert-danger").removeClass("hide").addClass("show");
-
-            let str = ``;
-            $.each( jqXHR.responseJSON, function( key, value ) {
-                str += `<label id="${key}-error" class="error" for="${key}">${value}</label>`;
-                $("#" + key).addClass("error");
-            });
-            $("#modalCreateOrder .modal-body .modal-alert-danger").html(str);
+            $("#modalCreateOrder .modal-body .modal-alert-danger").removeClass("show").addClass("hide");
+            $("#modalCreateOrder input.error").removeClass("error");
+            $('#modalCreateOrder')[0].reset();
+            $('#modalCreateOrder').validate().resetForm();
         });
-    });
 
-    function showDeleteModal() {
-        App.showDeleteConfirmDialog()
-            .then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        type: "DELETE",
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
+        $('#modalUpdateOrder').on('hidden.bs.modal', function () {
+            $("#currentRow").val("");
+            $("#modalUpdateOrder .modal-body .modal-alert-danger").empty();
+            $("#modalUpdateOrder .modal-body .modal-alert-danger").removeClass("show").addClass("hide");
+            $("#modalUpdateOrder input.error").removeClass("error");
+            $('#frmUpdateOrder')[0].reset();
+            $('#frmUpdateOrder').validate().resetForm();
+        });
 
-                        url: "http://localhost:8080/api/orders/delete/" + order.id,
+        function getStatus() {
+            let str = ``;
+            for (let i = 1; i <= status.length; i++) {
+                str += `
+                        <option value="${i}">${status[i-1]}</option>
+                        `;
+            }
+            $("#roleId").html(str);
+        }
 
-                    }).done( () => {
-                        App.showSuccessAlert("Succeeded client delete!");
-                        $("#tr_" + order.id).remove();
-                    }).fail( () => {
-                        App.showErrorAlert("An error occurred. Please try again later!");
-                    });
-                }
+        function getStatusUp() {
+            let str = ``;
+            for (let i = 1; i <= status.length; i++) {
+                str += `
+                        <option value="${i}">${status[i-1]}</option>
+                        `;
+            }
+            $("#upRoleId").html(str);
+        }
+
+        function getUsers() {
+
+            return $.ajax({
+                type: "GET",
+                url: "http://localhost:8080/api/users"
+            }).done((data) => {
+                data = data.sort(function (user1, user2) {
+                    return user1.id - user2.id;
+                });
+                let str = ``;
+                $.each(data, (index, item) => {
+                    user = item;
+                    str += `
+                        <option value="${user.id}">${user.fullName + " " + user.phone}</option>
+                        `;
+                });
+                $("#user").html(str);
+            }).fail(function() {
+                App.showErrorAlert("An error occurred. Please try again later !");
             });
-    }
+        }
 
-    $("a.create-modal").on("click", function () {
-        delete order.id;
-        showCreateModal();
-    });
+        function getUsersUp() {
 
-    $("#tbListOrders").on("click", ".edit", function () {
-
-        order.id = $(this).data('id');
-        $("#currentRow").val($(this).closest("tr").attr("id"));
-        showUpdateModal();
-    });
-
-    $("#tbListOrders").on("click", ".delete", function () {
-        order.id = $(this).data('id');
-        $("#currentRow").val($(this).closest("tr").attr("id"));
-        showDeleteModal();
-    });
-
-    $('#modalCreateOrder').on('hidden.bs.modal', function () {
-        $("#currentRow").val("");
-        $("#modalCreateOrder .modal-body .modal-alert-danger").empty();
-        $("#modalCreateOrder .modal-body .modal-alert-danger").removeClass("show").addClass("hide");
-        $("#modalCreateOrder input.error").removeClass("error");
-        $('#frmCreateOrder')[0].reset();
-        $('#frmCreateOrder').validate().resetForm();
-    });
-
-    $('#modalUpdateOrder').on('hidden.bs.modal', function () {
-        $("#currentRow").val("");
-        $("#modalUpdateOrder .modal-body .modal-alert-danger").empty();
-        $("#modalUpdateOrder .modal-body .modal-alert-danger").removeClass("show").addClass("hide");
-        $("#modalUpdateOrder input.error").removeClass("error");
-        $('#frmUpdateOrder')[0].reset();
-        $('#frmUpdateOrder').validate().resetForm();
-    });
-
-    function showDeleteModal() {
-        App.showDeleteConfirmDialog()
-            .then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        type: "DELETE",
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-
-                        url: "http://localhost:8080/api/orders/delete/" + order.id,
-
-                    }).done( () => {
-                        App.showSuccessAlert("Succeeded client delete!");
-                        $("#tr_" + order.id).remove();
-                    }).fail( () => {
-                        App.showErrorAlert("An error occurred. Please try again later!");
-                    });
-                }
+            return $.ajax({
+                type: "GET",
+                url: "http://localhost:8080/api/users"
+            }).done((data) => {
+                data = data.sort(function (user1, user2) {
+                    return user1.id - user2.id;
+                });
+                let str = ``;
+                $.each(data, (index, item) => {
+                    user = item;
+                    str += `
+                        <option value="${user.id}">${user.fullName + " " + user.phone}</option>
+                        `;
+                });
+                $("#upUser").html(str);
+            }).fail(function() {
+                App.showErrorAlert("An error occurred. Please try again later !");
             });
-    }
+        }
 
-    $(function () {
-        getOrders().then(function () {
-            drawOptionStatus();
-            drawOptionStatus();
+        $(function () {
+            getStatus();
+            getStatusUp();
             getUsers();
             getUsersUp();
-
-            $('[data-toggle="tooltip"]').tooltip();
+            getOrders().then(function () {
+                $('[data-toggle="tooltip"]').tooltip();
+            });
         });
-    });
-</script>
+
+    </script>
 
 </body>
 </html>

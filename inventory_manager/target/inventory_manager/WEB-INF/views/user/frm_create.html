@@ -11,7 +11,6 @@
                 </div>
                 <div class="modal-body">
                     <div class="modal-alert-danger hide"></div>
-
                     <form id="frmCreateUser" method="post">
                         <fieldset class="row g-3">
                             <div class="col-md-4">
@@ -21,27 +20,25 @@
                             </div>
 
                             <div class="col-md-4">
-                                <label class="form-label">Role</label>
-                                <select id="role" class="select form-control">
-                                </select>
-                            </div>
-
-                            <div class="col-md-4">
                                 <label class="form-label">Phone</label>
-                                <input type="text" class="form-control" id="phone" name="phone" data-rule-required="true"
-                                       data-msg-required="Phone is required">
+                                <input type="tel" class="form-control" id="phone" name="phone" data-rule-required="true"
+                                       data-msg-required="Full Name is required">
                             </div>
-
                             <div class="col-md-4">
-                                <label class="form-label">User Name</label>
-                                <input type="text" class="form-control" id="userName" name="userName" data-rule-required="true"
-                                       data-msg-required="User Name is required">
+                                <label class="form-label">Username</label>
+                                <input type="text" class="form-control" id="username" name="username" data-rule-required="true"
+                                       data-msg-required="Full Name is required">
                             </div>
-
                             <div class="col-md-4">
                                 <label class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password" name="password" data-rule-required="true"
+                                <input type="password" class="form-control" id="passwordHash" name="passwordHash" data-rule-required="true"
                                        data-msg-required="Password is required">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Role</label>
+                                <select id="roleId" class="select form-control">
+                                </select>
                             </div>
                         </fieldset>
                     </form>

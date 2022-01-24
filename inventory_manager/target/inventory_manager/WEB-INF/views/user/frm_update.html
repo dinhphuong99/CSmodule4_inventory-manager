@@ -1,46 +1,44 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 
-<th:block th:fragment="frm-create">
+<th:block th:fragment="frm-update">
 
-    <div id="modalUpdateOrder" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div id="modalUpdateUser" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <!--                    .setContent(content)-->
-                    <!--                    .setCreateAt(createAt)-->
-                    <!--                    .setUser(user.toUserDTO())-->
-                    <!--                    .setStatus(status)-->
-                    <!--                    .setTotalFee(totalFee);-->
-                    <h5 class="modal-title">Order information</h5>
+                    <h5 class="modal-title">User information</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="modal-alert-danger hide"></div>
-
-                    <form id="frmUpdateUserUp" method="post">
+                    <form id="frmUpdateUser" method="post">
                         <fieldset class="row g-3">
                             <div class="col-md-4">
-                                <label class="form-label">User</label>
-                                <select id="userUp" class="select form-control">
-                                </select>
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="form-label">Status</label>
-                                <select id="statusUp" class="select form-control">
-                                </select>
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="upFullName" name="upFullName" data-rule-required="true"
+                                       data-msg-required="Full Name is required">
                             </div>
 
                             <div class="col-md-4">
-                                <label class="form-label">Content</label>
-                                <input type="text" class="form-control" id="contentUp" name="contentUp" data-rule-required="true"
-                                       data-msg-required="Content is required">
+                                <label class="form-label">Phone</label>
+                                <input type="tel" class="form-control" id="upPhone" name="upPhone" data-rule-required="true"
+                                       data-msg-required="Full Name is required">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Username</label>
+                                <input type="text" class="form-control" id="upUserName" name="upUserName" data-rule-required="true"
+                                       data-msg-required="Full Name is required">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Password</label>
+                                <input type="password" class="form-control" id="upPasswordHash" name="upPasswordHash" data-rule-required="true"
+                                       data-msg-required="Password is required">
                             </div>
 
-                            <div class="col-md-3">
-                                <label class="form-label">Total Fee</label>
-                                <input type="number" class="form-control" id="totalFeeUp" name="totalFeeUp" data-rule-required="true"
-                                       data-msg-required="TotalFee is required">
+                            <div class="col-md-4">
+                                <label class="form-label">Role</label>
+                                <select id="upRoleId" class="select form-control">
+                                </select>
                             </div>
                         </fieldset>
                     </form>
@@ -48,9 +46,9 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 
-                    <button type="button" id="btnUpdateOrder" class="btn btn-outline-primary">
+                    <button type="button" id="btnUpdateUser" class="btn btn-outline-primary">
                         <i class="fa fa-plus" aria-hidden="true"></i>
-                        Update order
+                        Update user
                     </button>
                 </div>
             </div>
@@ -58,6 +56,3 @@
     </div>
 
 </th:block>
-
-
-

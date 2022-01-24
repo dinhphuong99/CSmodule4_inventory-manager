@@ -5,319 +5,318 @@
     <th:block th:replace="/layout/head :: head" />
 </head>
 <body>
-<div class="container">
-    <div class="table-title">
-        <div class="row">
-            <div class="col-sm-5">
-                <h1>List of product</h1>
-            </div>
-            <div class="col-sm-7">
-                <a class="btn btn-outline-light create-modal"><i class="fa fa-plus-square-o" aria-hidden="true"></i> <span>Add New Product</span></a>
+    <div class="container">
+        <div class="table-title">
+            <div class="row">
+                <div class="col-sm-5">
+                    <h1>List of product</h1>
+                </div>
+                <div class="col-sm-7">
+                    <a class="btn btn-outline-light create-modal"><i class="fa fa-plus-square-o" aria-hidden="true"></i> <span>Add New Product</span></a>
+                </div>
             </div>
         </div>
+        <div class="box-body">
+
+            <th:block th:replace="/product/frm_list_table.html::list-products" />
+
+            <input type="hidden" id="currentRow"/>
+
+            <table id="tbListProducts" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Title product</th>
+                        <th>Title category</th>
+                        <th colspan="2">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+
+        </div>
     </div>
-    <div class="box-body">
 
-        <th:block th:replace="/product/frm_list_table.html::list-products" />
+    <th:block th:replace="/product/frm_create :: frm-create" />
 
-        <input type="hidden" id="currentRow"/>
+    <th:block th:replace="/product/frm_update :: frm-update" />
 
-        <table id="tbListProducts" class="table table-hover">
-            <thead>
-            <tr>
-                <th>#</th>
-                <th>Title product</th>
-                <th>Title category</th>
-                <th colspan="2">Action</th>
-            </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
+    <th:block th:replace="/layout/script :: script" />
 
-    </div>
-</div>
-
-<th:block th:replace="/product/frm_create :: frm-create" />
-
-<th:block th:replace="/product/frm_update :: frm-update" />
-
-<th:block th:replace="/layout/script :: script" />
-
-<script>
-    let page = {
-        urls: {
-            getAllCategories: App.BASE_URL_CATEGORY,
-            getAllProducts: App.BASE_URL_PRODUCT,
-            getProductById: App.BASE_URL_PRODUCT + '/',
-            saveNew: App.BASE_URL_PRODUCT + '/create/',
-            saveEdit: App.BASE_URL_PRODUCT + '/update/',
-            doDelete: App.BASE_URL_PRODUCT + '/delete/'
+    <script>
+        let page = {
+            urls: {
+                getAllCategories: App.BASE_URL_CATEGORY,
+                getAllProducts: App.BASE_URL_PRODUCT,
+                getProductById: App.BASE_URL_PRODUCT + '/',
+                saveNew: App.BASE_URL_PRODUCT + '/create/',
+                saveEdit: App.BASE_URL_PRODUCT + '/update/',
+                doDelete: App.BASE_URL_PRODUCT + '/delete/'
+            }
         }
-    }
 
-    let product = new Product();
-    let category = new Category();
-    let tempProduct = jQuery.validator.format($.trim($("#tempProduct").val()));
+        let product = new Product();
+        let category = new Category();
+        let tempProduct = jQuery.validator.format($.trim($("#tempProduct").val()));
 
-    let addRow = () => {
-        $("#tbListProducts tbody").prepend($(tempProduct(product.id, product.title, category.titleCategory)));
-    }
+        let addRow = () => {
+            $("#tbListProducts tbody").prepend($(tempProduct(product.id, product.title, category.titleCategory)));
+        }
 
-    function getProducts() {
+        function getProducts() {
 
-        return $.ajax({
-            type: "GET",
-            // url: page.urls.getAllProducts,
-            url: "http://localhost:8080/api/products"
-        }).done((data) => {
-            data = data.sort(function (prod1, prod2) {
-                return prod1.id - prod2.id;
-            });
-            $.each(data, (index, item) => {
-                product = item;
-                category = product.category;
-                addRow();
-            });
-        }).fail(function() {
-            App.showErrorAlert("An error occurred. Please try again later !");
-        });
-    }
-
-    function getCategories() {
-        return $.ajax({
-            type: "GET",
-            url: page.urls.getAllCategories,
-        }).done((data) => {
-            data = data.sort(function (cat1, cat2) {
-                return cat1.id - cat2.id;
-            });
-            let str = ``;
-            $.each(data, (index, item) => {
-                category = item;
-                // addRow();
-                str += `
-                        <option value="${category.id}">${category.titleCategory}</option>
-                        `;
-            });
-            $("#category").html(str);
-        }).fail(function() {
-            App.showErrorAlert("An error occurred. Please try again later !");
-        });
-    }
-
-    function getCategoriesUp() {
-        return $.ajax({
-            type: "GET",
-            url: page.urls.getAllCategories,
-        }).done((data) => {
-            data = data.sort(function (cat1, cat2) {
-                return cat1.id - cat2.id;
-            });
-            let str = ``;
-            $.each(data, (index, item) => {
-                category = item;
-                // addRow();
-                str += `
-                        <option value="${category.id}">${category.titleCategory}</option>
-                        `;
-            });
-            $("#upCategory").html(str);
-        }).fail(function() {
-            App.showErrorAlert("An error occurred. Please try again later !");
-        });
-    }
-
-    function showCreateModal() {
-        $('#modalCreateProduct').modal('show');
-    }
-
-    function showUpdateModal() {
-
-        if (product.id == null) {
-            $('#modalUpdateProduct').modal('hide');
-            $('#frmUpdateProduct')[0].reset();
-        } else {
-            $.ajax({
+            return $.ajax({
                 type: "GET",
-                url: page.urls.getProductById + product.id,
-            }).done((resp) => {
-                product = resp;
-                category = product.category;
-                assignUpdateModal();
-
+                // url: page.urls.getAllProducts,
+                url: "http://localhost:8080/api/products"
+            }).done((data) => {
+                data = data.sort(function (prod1, prod2) {
+                    return prod1.id - prod2.id;
+                });
+                $.each(data, (index, item) => {
+                    product = item;
+                    category = product.category;
+                    addRow();
+                });
             }).fail(function() {
                 App.showErrorAlert("An error occurred. Please try again later !");
             });
         }
-    }
 
-    function assignUpdateModal() {
-        $("#upTitle").val(product.title);
-        $("#upCategory").val(category.id);
-        $("#upCategory :selected").text(category.titleCategory);
-        $('#modalUpdateProduct').modal('show');
-    }
-
-    function showDeleteModal() {
-        App.showDeleteConfirmDialog()
-            .then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        type: "DELETE",
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-
-                        url: "http://localhost:8080/api/products/delete/" + product.id,
-
-                    }).done( () => {
-                        App.showSuccessAlert("Succeeded client delete!");
-                        $("#tr_" + product.id).remove();
-                    }).fail( () => {
-                        App.showErrorAlert("An error occurred. Please try again later!");
-                    });
-                }
+        function getCategories() {
+            return $.ajax({
+                type: "GET",
+                url: page.urls.getAllCategories,
+            }).done((data) => {
+                data = data.sort(function (cat1, cat2) {
+                    return cat1.id - cat2.id;
+                });
+                let str = ``;
+                $.each(data, (index, item) => {
+                    category = item;
+                    // addRow();
+                    str += `
+                        <option value="${category.id}">${category.titleCategory}</option>
+                        `;
+                });
+                $("#category").html(str);
+            }).fail(function() {
+                App.showErrorAlert("An error occurred. Please try again later !");
             });
-    }
+        }
 
-    $("#btnCreateProduct").on("click", function () {
+        function getCategoriesUp() {
+            return $.ajax({
+                type: "GET",
+                url: page.urls.getAllCategories,
+            }).done((data) => {
+                data = data.sort(function (cat1, cat2) {
+                    return cat1.id - cat2.id;
+                });
+                let str = ``;
+                $.each(data, (index, item) => {
+                    category = item;
+                    // addRow();
+                    str += `
+                        <option value="${category.id}">${category.titleCategory}</option>
+                        `;
+                });
+                $("#upCategory").html(str);
+            }).fail(function() {
+                App.showErrorAlert("An error occurred. Please try again later !");
+            });
+        }
 
-        delete category.id;
-        delete product.id;
+        function showCreateModal() {
+            $('#modalCreateProduct').modal('show');
+        }
 
-        product.title = $("#title").val();
-        category.id = $("#category").val();
-        category.titleCategory = $("#category :selected").text();
-        product.category = category;
+        function showUpdateModal() {
 
-        console.log(product);
+            if (product.id == null) {
+                $('#modalUpdateProduct').modal('hide');
+                $('#frmUpdateProduct')[0].reset();
+            } else {
+                $.ajax({
+                    type: "GET",
+                    url: page.urls.getProductById + product.id,
+                }).done((resp) => {
+                    product = resp;
+                    category = product.category;
+                    assignUpdateModal();
 
-        $.ajax({
-            type: "POST",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            url: page.urls.saveNew,
-            data: JSON.stringify(product)
-        }).done( (data) => {
-            product = data;
+                }).fail(function() {
+                    App.showErrorAlert("An error occurred. Please try again later !");
+                });
+            }
+        }
+
+        function assignUpdateModal() {
+            $("#upTitle").val(product.title);
+            $("#upCategory").val(category.id);
+            $("#upCategory :selected").text(category.titleCategory);
+            $('#modalUpdateProduct').modal('show');
+        }
+
+        function showDeleteModal() {
+            App.showDeleteConfirmDialog()
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            type: "DELETE",
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            },
+
+                            url: "http://localhost:8080/api/products/delete/" + product.id,
+
+                        }).done( () => {
+                            App.showSuccessAlert("Succeeded client delete!");
+                            $("#tr_" + product.id).remove();
+                        }).fail( () => {
+                            App.showErrorAlert("An error occurred. Please try again later!");
+                        });
+                    }
+                });
+        }
+
+        $("#btnCreateProduct").on("click", function () {
+
+            delete category.id;
+            delete product.id;
+
+            product.title = $("#title").val();
+            category.id = $("#category").val();
+            category.titleCategory = $("#category :selected").text();
+            product.category = category;
+
             console.log(product);
-            addRow();
 
-            App.showSuccessAlert("Successful data generation !");
-            App.formatTooltip();
+            $.ajax({
+                type: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                url: page.urls.saveNew,
+                data: JSON.stringify(product)
+            }).done( (data) => {
+                product = data;
+                console.log(product);
+                addRow();
 
-            $('#modalCreateProduct').modal('hide');
+                App.showSuccessAlert("Successful data generation !");
+                App.formatTooltip();
 
-        }).fail( (jqXHR, textStatus, errorThrown) => {
-            $("#modalCreateProduct .modal-body .modal-alert-danger").empty();
-            $("#modalCreateProduct .modal-body .modal-alert-danger").removeClass("hide").addClass("show");
+                $('#modalCreateProduct').modal('hide');
 
-            let str = ``;
-            $.each( jqXHR.responseJSON, function( key, value ) {
-                str += `<label id="${key}-error" class="error" for="${key}">${value}</label>`;
-                $("#" + key).addClass("error");
+            }).fail( (jqXHR, textStatus, errorThrown) => {
+                $("#modalCreateProduct .modal-body .modal-alert-danger").empty();
+                $("#modalCreateProduct .modal-body .modal-alert-danger").removeClass("hide").addClass("show");
+
+                let str = ``;
+                $.each( jqXHR.responseJSON, function( key, value ) {
+                    str += `<label id="${key}-error" class="error" for="${key}">${value}</label>`;
+                    $("#" + key).addClass("error");
+                });
+                $("#modalCreateProduct .modal-body .modal-alert-danger").html(str);
             });
-            $("#modalCreateProduct .modal-body .modal-alert-danger").html(str);
         });
-    });
 
-    $("#btnUpdateProduct").on("click", function () {
+        $("#btnUpdateProduct").on("click", function () {
 
-        product.title = $("#upTitle").val();
-        category.id = $("#upCategory").val();
-        category.titleCategory = $("#upCategory :selected").text();
-        product.category = category;
+            product.title = $("#upTitle").val();
+            category.id = $("#upCategory").val();
+            category.titleCategory = $("#upCategory :selected").text();
+            product.category = category;
 
-        // console.log(product);
+            // console.log(product);
 
-        $.ajax({
-            type: "PUT",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            url: page.urls.saveEdit,
-            data: JSON.stringify(product)
-        }).done( (resp) => {
-            product = resp;
-            category = product.category;
+            $.ajax({
+                type: "PUT",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                url: page.urls.saveEdit,
+                data: JSON.stringify(product)
+            }).done( (resp) => {
+                product = resp;
+                category = product.category;
 
-            let current_row = $("#tbListProducts tbody").find('#' + $("#currentRow").val());
-            let updated_row = $(tempProduct(product.id, product.title, category.titleCategory))
-            current_row.replaceWith (updated_row);
+                let current_row = $("#tbListProducts tbody").find('#' + $("#currentRow").val());
+                let updated_row = $(tempProduct(product.id, product.title, category.titleCategory))
+                current_row.replaceWith (updated_row);
 
+                $("#currentRow").val("");
+                $("#frmUpdateProduct")[0].reset();
+                $("#frmUpdateProduct").validate().resetForm();
+
+                App.showSuccessAlert("Data update successful !");
+                App.formatTooltip();
+
+                $('#modalUpdateProduct').modal('hide');
+
+            }).fail( (jqXHR) => {
+                $("#modalUpdateProduct .modal-body .modal-alert-danger").empty();
+                $("#modalUpdateProduct .modal-body .modal-alert-danger").removeClass("hide").addClass("show");
+
+                let str = ``;
+                $.each( jqXHR.responseJSON, function( key, value ) {
+                    str += `<label id="${key}Up-error" class="error" for="${key}Up">${value}</label>`;
+                    $("#" + key + "Up").addClass("error");
+                });
+                $("#modalUpdateProduct .modal-body .modal-alert-danger").html(str);
+            });
+        });
+
+        $("a.create-modal").on("click", function () {
+            delete product.id;
+            showCreateModal();
+        });
+
+        $("#tbListProducts").on("click", ".edit", function () {
+
+            product.id = $(this).data('id');
+            $("#currentRow").val($(this).closest("tr").attr("id"));
+            showUpdateModal();
+        });
+
+        $("#tbListProducts").on("click", ".delete", function () {
+            product.id = $(this).data('id');
+            $("#currentRow").val($(this).closest("tr").attr("id"));
+            showDeleteModal();
+        });
+
+        $('#modalCreateProduct').on('hidden.bs.modal', function () {
             $("#currentRow").val("");
-            $("#frmUpdateProduct")[0].reset();
-            $("#frmUpdateProduct").validate().resetForm();
+            $("#modalCreateProduct .modal-body .modal-alert-danger").empty();
+            $("#modalCreateProduct .modal-body .modal-alert-danger").removeClass("show").addClass("hide");
+            $("#modalCreateProduct input.error").removeClass("error");
+            $('#frmCreateProduct')[0].reset();
+            $('#frmCreateProduct').validate().resetForm();
+        });
 
-            App.showSuccessAlert("Data update successful !");
-            App.formatTooltip();
-
-            $('#modalUpdateProduct').modal('hide');
-
-        }).fail( (jqXHR) => {
+        $('#modalUpdateProduct').on('hidden.bs.modal', function () {
+            $("#currentRow").val("");
             $("#modalUpdateProduct .modal-body .modal-alert-danger").empty();
-            $("#modalUpdateProduct .modal-body .modal-alert-danger").removeClass("hide").addClass("show");
+            $("#modalUpdateProduct .modal-body .modal-alert-danger").removeClass("show").addClass("hide");
+            $("#modalUpdateProduct input.error").removeClass("error");
+            $('#frmUpdateProduct')[0].reset();
+            $('#frmUpdateProduct').validate().resetForm();
+        });
 
-            let str = ``;
-            $.each( jqXHR.responseJSON, function( key, value ) {
-                str += `<label id="${key}Up-error" class="error" for="${key}Up">${value}</label>`;
-                $("#" + key + "Up").addClass("error");
+        $(function () {
+            getProducts().then(function () {
+                getCategories();
+                getCategoriesUp();
+                $('[data-toggle="tooltip"]').tooltip();
             });
-            $("#modalUpdateProduct .modal-body .modal-alert-danger").html(str);
         });
-    });
 
-    $("a.create-modal").on("click", function () {
-        delete product.id;
-        showCreateModal();
-    });
-
-    $("#tbListProducts").on("click", ".edit", function () {
-
-        product.id = $(this).data('id');
-        $("#currentRow").val($(this).closest("tr").attr("id"));
-        showUpdateModal();
-    });
-
-
-    $("#tbListProducts").on("click", ".delete", function () {
-        product.id = $(this).data('id');
-        $("#currentRow").val($(this).closest("tr").attr("id"));
-        showDeleteModal();
-    });
-
-    $('#modalCreateProduct').on('hidden.bs.modal', function () {
-        $("#currentRow").val("");
-        $("#modalCreateProduct .modal-body .modal-alert-danger").empty();
-        $("#modalCreateProduct .modal-body .modal-alert-danger").removeClass("show").addClass("hide");
-        $("#modalCreateProduct input.error").removeClass("error");
-        $('#frmCreateProduct')[0].reset();
-        $('#frmCreateProduct').validate().resetForm();
-    });
-
-    $('#modalUpdateProduct').on('hidden.bs.modal', function () {
-        $("#currentRow").val("");
-        $("#modalUpdateProduct .modal-body .modal-alert-danger").empty();
-        $("#modalUpdateProduct .modal-body .modal-alert-danger").removeClass("show").addClass("hide");
-        $("#modalUpdateProduct input.error").removeClass("error");
-        $('#frmUpdateProduct')[0].reset();
-        $('#frmUpdateProduct').validate().resetForm();
-    });
-
-    $(function () {
-        getProducts().then(function () {
-            getCategories();
-            getCategoriesUp();
-            $('[data-toggle="tooltip"]').tooltip();
-        });
-    });
-
-</script>
+    </script>
 
 </body>
 </html>

@@ -73,10 +73,10 @@ public class ItemAPI {
             return appUtils.mapErrorToResponse(bindingResult);
 
         try {
-            Optional<Item> item = itemService.findByLocationAndIdIsNot(itemDTO.getLocation(), 0L);
+            Optional<Item> item = itemService.findByLocationAndIdIsNot(itemDTO.getLocation(), itemDTO.getId());
 
             if(item.isPresent())
-                throw new DataInputException("Location already exists");
+                throw new TitleExistsException("Location already exists");
             Item item1 = itemDTO.toItem();
             Order order = itemDTO.getOrder().toOrder();
             User user = itemDTO.getUser().toUser();
@@ -102,7 +102,7 @@ public class ItemAPI {
             Optional<Item> item = itemService.findByLocationAndIdIsNot(itemDTO.getLocation(), itemDTO.getId());
 
             if(item.isPresent())
-                throw new DataInputException("Location already exists");
+                throw new TitleExistsException("Location already exists");
             Item item1 = itemDTO.toItem();
             Order order = itemDTO.getOrder().toOrder();
             User user = itemDTO.getUser().toUser();

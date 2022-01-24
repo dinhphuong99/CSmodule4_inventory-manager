@@ -32,11 +32,11 @@ public class UserDTO {
     @Column(unique = true)
     private String phone;
 
-    @Size(min = 1, max = 45, message = "Username description within 45 characters ! ")
+    @Size(min = 1, max = 45, message = "Username description within 45 characters !")
     @Column(unique = true)
     private String username;
 
-    @Size(min = 8, max = 25, message = "Password 8 to 25 characters ! ")
+    @Size(min = 8, max = 20, message = "Password description 8 to 20 characters !")
     private String passwordHash;
 
     public User toUser() {

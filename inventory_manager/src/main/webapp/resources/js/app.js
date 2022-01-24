@@ -215,11 +215,3 @@ class Status{
 const status = ["NEW", "BOOKED", "PAID", "CANCELLED"];
 
 const role = ["USER", "ADMIN"];
-
-function drawOptionStatus(temp){
-    let str =``;
-    for (let i = 1; i <= status.length; i++) {
-        str += `<option value="${i}">${status[i-1]}</option>`;
-    }
-    $(temp).html(str);
-}

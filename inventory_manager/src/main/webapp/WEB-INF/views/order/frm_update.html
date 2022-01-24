@@ -1,5 +1,3 @@
-
-
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 
 <th:block th:fragment="frm-update">
@@ -13,37 +11,34 @@
                 </div>
                 <div class="modal-body">
                     <div class="modal-alert-danger hide"></div>
-
                     <form id="frmUpdateUser" method="post">
                         <fieldset class="row g-3">
                             <div class="col-md-4">
                                 <label class="form-label">Full Name</label>
-                                <input type="text" class="form-control" id="fullNameUp" name="fullNameUp" data-rule-required="true"
+                                <input type="text" class="form-control" id="upFullName" name="upFullName" data-rule-required="true"
                                        data-msg-required="Full Name is required">
                             </div>
 
                             <div class="col-md-4">
-                                <label class="form-label">Role</label>
-                                <select id="roleUp" class="select form-control">
-                                </select>
-                            </div>
-
-                            <div class="col-md-4">
                                 <label class="form-label">Phone</label>
-                                <input type="text" class="form-control" id="phoneUp" name="phoneUp" data-rule-required="true"
-                                       data-msg-required="Phone is required">
+                                <input type="tel" class="form-control" id="upPhone" name="upPhone" data-rule-required="true"
+                                       data-msg-required="Full Name is required">
                             </div>
-
                             <div class="col-md-4">
-                                <label class="form-label">User Name</label>
-                                <input type="text" class="form-control" id="userNameUp" name="userNameUp" data-rule-required="true"
-                                       data-msg-required="User Name is required">
+                                <label class="form-label">Username</label>
+                                <input type="text" class="form-control" id="upUserName" name="upUserName" data-rule-required="true"
+                                       data-msg-required="Full Name is required">
                             </div>
-
                             <div class="col-md-4">
                                 <label class="form-label">Password</label>
-                                <input type="password" class="form-control" id="passwordUp" name="passwordUp" data-rule-required="true"
+                                <input type="password" class="form-control" id="upPasswordHash" name="upPasswordHash" data-rule-required="true"
                                        data-msg-required="Password is required">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Role</label>
+                                <select id="upRoleId" class="select form-control">
+                                </select>
                             </div>
                         </fieldset>
                     </form>
@@ -61,4 +56,3 @@
     </div>
 
 </th:block>
-
